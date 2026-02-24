@@ -1,0 +1,17 @@
+{
+  "name": "student_blog_platform",
+  "version": "1.0.0",
+  "description": "This is our Student Blog Platform Project of Backend",
+  "license": "ISC",
+  "author": "Sukhpreet Singh, Ashu, Anshika Sharma",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --watch index"
+  },
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "prompt-sync": "^4.2.0"
+  }
+}
