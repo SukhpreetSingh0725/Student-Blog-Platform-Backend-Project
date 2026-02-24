@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="css/home.css">
+    <title><%=title %></title>
+</head>
+<body>
+
+   
+    <%- include('partials/header')%>
+    <section class="hero">
+        <div class="hero-content">
+          <h1>Read. Write. Inspire.</h1>
+          <p>
+            A modern blogging platform where students share ideas,
+            experiences, and knowledge.
+          </p>
+          <a href="#" class="btn-primary">Explore Blogs</a>
+        </div>
+      </section>
+
+      <section class="blogs">
+        <h2>Latest Blogs</h2>
+    
+        <div class="blog-grid">
+          <div class="blog-card">
+            <h3>Getting Started with Web Development</h3>
+            <p>
+              Learn the basics of HTML, CSS, and JavaScript and start
+              your web development journey.
+            </p>
+            <a href="#">Read More →</a>
+          </div>
+    
+          <div class="blog-card">
+            <h3>Why Every Student Should Learn Coding</h3>
+            <p>
+              Coding improves problem-solving skills and opens doors
+              to multiple career opportunities.
+            </p>
+            <a href="#">Read More →</a>
+          </div>
+    
+          <div class="blog-card">
+            <h3>Backend vs Frontend Development</h3>
+            <p>
+              Understand the difference between frontend and backend
+              development with real examples.
+            </p>
+            <a href="#">Read More →</a>
+          </div>
+        </div>
+      </section>
+
+   
+    
+   
+   
+    <%- include('partials/footer')%>
+ 
+    
+   
+</body>
+</html>
