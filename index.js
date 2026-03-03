@@ -5,6 +5,7 @@ const app = express();
 const PORT = 3000;
 
 const DATA_FILE=path.join(__dirname,"data","messages.json");
+const USERS_FILE=path.join(__dirname,"data","users.json");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -51,7 +52,11 @@ app.post("/contact",(req,res)=>{
   fs.writeFileSync(DATA_FILE,JSON.stringify(messages,null,2));
 
   res.render("success",{title: "Message Sent",
-    name: req.body.UserName
+    name: req.body.UserName,
+    currentPage: "success",
+    message: "Your message has been sent successfully.",
+    redirectUrl: "/contact",
+    buttonText: "Go Back to Contact"
   });
 });
 
@@ -62,6 +67,85 @@ app.get("/about", (req, res) => {
     currentPage: "about"
   });
 });
+
+app.get("/signup", (req, res) => {
+  res.render("signup", {
+    title: "Sign Up",
+    error: null,
+    currentPage: "signup"
+  });
+});
+
+app.post("/signup", (req, res) => {
+  const name = req.body.UserName;
+  const email = req.body.UserEmail;
+  const password= req.body.password;
+
+
+  if (!name || !email || !password) {
+    return res.render("signup", {
+      title: "Sign Up",
+      error: "All fields are required.",
+      currentPage: "signup"
+    });
+  }
+
+  if (!email.includes("@")) {
+    return res.render("signup", {
+      title: "Sign Up",
+      error: "Invalid email format.",
+      currentPage: "signup"
+    });
+  }
+
+  if (password.length < 6) {
+    return res.render("signup", {
+      title: "Sign Up",
+      error: "Password must be at least 6 characters.",
+      currentPage: "signup"
+    });
+  }
+
+  let users = [];
+
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
+  }
+
+  const existingUser = users.find(user => user.email === email);
+
+  if (existingUser) {
+    return res.render("signup", {
+      title: "Sign Up",
+      error: "Email already registered.",
+      currentPage: "signup"
+    });
+  }
+
+  const newuser={
+    name: req.body.UserName,
+    email: req.body.UserEmail,
+    password: req.body.password,
+    date: new Date().toLocaleString()
+};
+
+  users.push(newuser);
+
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+  res.render("success", {
+    title: "Account Created",
+    name: req.body.UserName,
+    currentPage: "success",
+    message: "Your account has been created successfully.",
+    redirectUrl: "/signin",
+    buttonText: "Go to Sign In"
+  });
+
+});
+
+
+
 
 app.use((req,res)=>{
     res.status(404).send("<h1>404 - Page Not Found</h1><p> Sorry, we couldn't find that!</p>");

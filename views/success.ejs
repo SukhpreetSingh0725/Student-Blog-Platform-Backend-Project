@@ -12,10 +12,13 @@
 <section class="success-page">
   <div class="success-box">
     <h2>Thank You, <%= name %>! 🎉</h2>
-    <p>Your message has been sent successfully.</p>
+    
+    <p><%= message %></p>
 
     <div class="success-actions">
-      <a href="/contact" class="btn-primary">Go Back to Contact</a>
+      <a href="<%= redirectUrl %>" class="btn-primary">
+        <%= buttonText %>
+      </a>
       <a href="/" class="btn-secondary">Go to Home</a>
     </div>
   </div>

@@ -394,3 +394,42 @@
     gap: 15px;
   }
 }
+
+
+/* AUTH PAGES */
+
+.auth-section {
+  padding: 100px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-box {
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  width: 350px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+.auth-box h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  text-align: center;
+}
