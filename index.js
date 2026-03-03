@@ -27,7 +27,9 @@ app.post("/contact",(req,res)=>{
   const name = req.body.UserName;
   const email = req.body.UserEmail;
   const message= req.body.message;
-  res.send(`<h1> Thanks, ${name}!</h1><p> We received your message.</p>`);
+
+ 
+  
   
   const newMessages={
       name: req.body.UserName,
@@ -43,6 +45,10 @@ app.post("/contact",(req,res)=>{
   }
   messages.push(newMessages);
   fs.writeFileSync(DATA_FILE,JSON.stringify(messages,null,2));
+
+  res.render("success",{title: "Message Sent",
+    name: req.body.UserName
+  });
 });
 
 app.use((req,res)=>{

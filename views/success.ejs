@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+
+<%- include("partials/header") %>
+
+<section class="success-page">
+  <div class="success-box">
+    <h2>Thank You, <%= name %>! 🎉</h2>
+    <p>Your message has been sent successfully.</p>
+
+    <div class="success-actions">
+      <a href="/contact" class="btn-primary">Go Back to Contact</a>
+      <a href="/" class="btn-secondary">Go to Home</a>
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer") %>
+
+</body>
+</html>
