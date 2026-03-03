@@ -8,11 +8,11 @@
   
 
       <nav class="nav-links">
-        <a href="/" class="active">Home</a>
-        <a href="/about">About</a>
-        <a href="/contact" class="active">Contact</a>
-        <a href="/signin">Sign In</a>
-        <a href="/signup" class="btn-nav">Sign Up</a>
+        <a href="/" class="<%= currentPage === 'home' ? 'active' : '' %>">Home</a>
+        <a href="/about" class="<%= currentPage === 'about' ? 'active' : '' %>">About</a>
+        <a href="/contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">Contact</a>
+        <a href="/signin" class="<%= currentPage === 'sign in' ? 'active' : '' %>">Sign In</a>
+        <a href="/signup" class="<%= currentPage === 'sign up' ? 'active' : '' %>" class="btn-nav">Sign Up</a>
       </nav>
   
     </div>

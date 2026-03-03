@@ -288,3 +288,77 @@
 .btn-secondary:hover {
   background-color: #374151;
 }
+
+
+.about-hero {
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: white;
+  padding: 100px 20px;
+  text-align: center;
+}
+
+.about-hero-content {
+  max-width: 700px;
+  margin: auto;
+}
+
+.about-hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+}
+
+.about-hero p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about-section {
+  padding: 80px 20px;
+  background-color: #f9fafb;
+}
+
+.about-container {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.about-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-8px);
+}
+
+.about-card h2 {
+  margin-bottom: 15px;
+  color: #4f46e5;
+}
+
+.about-card p {
+  color: #555;
+  line-height: 1.6;
+}
+
+.about-cta {
+  padding: 80px 20px;
+  text-align: center;
+  background-color: white;
+}
+
+.about-cta h2 {
+  margin-bottom: 20px;
+}
+
+.nav-links .active {
+  color: #4f46e5;
+  border-bottom: 2px solid #4f46e5;
+  padding-bottom: 3px;
+}

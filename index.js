@@ -15,11 +15,15 @@ app.use(express.urlencoded({extended:true}));
 
 
 app.get("/", (req, res) => {
-  res.render("home", {title: "Student Blog Platform"});
+  res.render("home", {title: "Student Blog Platform",
+    currentPage: "home"
+  });
 });
 
 app.get("/contact", (req, res) => {
-  res.render("contact", {title: "Contact - Student Blog Platform"});
+  res.render("contact", {title: "Contact - Student Blog Platform",
+    currentPage: "contact"
+  });
 });
 
 
@@ -48,6 +52,14 @@ app.post("/contact",(req,res)=>{
 
   res.render("success",{title: "Message Sent",
     name: req.body.UserName
+  });
+});
+
+
+app.get("/about", (req, res) => {
+  res.render("about", {
+    title: "About - Student Blog Platform",
+    currentPage: "about"
   });
 });
 
