@@ -145,6 +145,64 @@ app.post("/signup", (req, res) => {
 });
 
 
+app.get("/signin", (req, res) => {
+  res.render("signin", {
+    title: "Sign In",
+    error: null,
+    currentPage:"signin"
+  });
+});
+
+app.post("/signin", (req, res) => {
+  const email = req.body.UserEmail;
+  const password= req.body.password;
+
+  if (!email || !password) {
+    return res.render("signin", {
+      title: "Sign In",
+      error: "All fields are required.",
+      currentPage: "signin"
+    });
+  }
+
+  let users = [];
+
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
+  }
+
+  const user = users.find(
+    user =>
+      user.email.toLowerCase() === email.toLowerCase() &&
+      user.password === password
+  );
+
+  if (!user) {
+    return res.render("signin", {
+      title: "Sign In",
+      error: "Invalid email or password.",
+      currentPage: "signin"
+    });
+  }
+
+
+  res.render("dashboard", {
+    title: "Dashboard",
+    user: user,
+    currentPage: "dashboard"
+  });
+
+  
+});
+
+
+
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/");
+  });
+});
+
 
 
 app.use((req,res)=>{

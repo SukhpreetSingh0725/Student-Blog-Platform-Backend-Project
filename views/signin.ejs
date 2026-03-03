@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>signin page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+    <%- include("partials/header") %>
+
+    <section class="auth-section">
+      <div class="auth-box">
+        <h2>Welcome Back</h2>
+    
+        <% if (locals.error) { %>
+          <div class="error-message"><%= error %></div>
+        <% } %>
+    
+        <form action="/signin" method="POST">
+          <input type="email" name="UserEmail" placeholder="Email Address" required>
+          <input type="password" name="password" placeholder="Password" required>
+          <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+      </div>
+    </section>
+    
+    <%- include("partials/footer") %>
+
+
+</body>
+</html>
