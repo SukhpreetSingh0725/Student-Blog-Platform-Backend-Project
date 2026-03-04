@@ -16,13 +16,13 @@ app.use(express.urlencoded({extended:true}));
 
 
 app.get("/", (req, res) => {
-  res.render("home", {title: "Student Blog Platform",
+  res.render("home", {title: "HomePage - Student Blog Platform",
     currentPage: "home"
   });
 });
 
 app.get("/contact", (req, res) => {
-  res.render("contact", {title: "Contact - Student Blog Platform",
+  res.render("contact", {title: "ContactPage - Student Blog Platform",
     currentPage: "contact"
   });
 });
@@ -63,14 +63,14 @@ app.post("/contact",(req,res)=>{
 
 app.get("/about", (req, res) => {
   res.render("about", {
-    title: "About - Student Blog Platform",
+    title: "AboutPage - Student Blog Platform",
     currentPage: "about"
   });
 });
 
 app.get("/signup", (req, res) => {
   res.render("signup", {
-    title: "Sign Up",
+    title: "SignUp- Student Blog Platform",
     error: null,
     currentPage: "signup"
   });
@@ -84,7 +84,7 @@ app.post("/signup", (req, res) => {
 
   if (!name || !email || !password) {
     return res.render("signup", {
-      title: "Sign Up",
+      title: "SignUp- Student Blog Platform",
       error: "All fields are required.",
       currentPage: "signup"
     });
@@ -92,7 +92,7 @@ app.post("/signup", (req, res) => {
 
   if (!email.includes("@")) {
     return res.render("signup", {
-      title: "Sign Up",
+      title: "SignUp- Student Blog Platform",
       error: "Invalid email format.",
       currentPage: "signup"
     });
@@ -100,7 +100,7 @@ app.post("/signup", (req, res) => {
 
   if (password.length < 6) {
     return res.render("signup", {
-      title: "Sign Up",
+      title: "SignUp- Student Blog Platform",
       error: "Password must be at least 6 characters.",
       currentPage: "signup"
     });
@@ -116,7 +116,7 @@ app.post("/signup", (req, res) => {
 
   if (existingUser) {
     return res.render("signup", {
-      title: "Sign Up",
+      title: "SignUp- Student Blog Platform",
       error: "Email already registered.",
       currentPage: "signup"
     });
@@ -147,7 +147,7 @@ app.post("/signup", (req, res) => {
 
 app.get("/signin", (req, res) => {
   res.render("signin", {
-    title: "Sign In",
+    title: "SignIn- Student Blog Platform",
     error: null,
     currentPage:"signin"
   });
@@ -159,7 +159,7 @@ app.post("/signin", (req, res) => {
 
   if (!email || !password) {
     return res.render("signin", {
-      title: "Sign In",
+      title: "SignIn- Student Blog Platform",
       error: "All fields are required.",
       currentPage: "signin"
     });
@@ -179,7 +179,7 @@ app.post("/signin", (req, res) => {
 
   if (!user) {
     return res.render("signin", {
-      title: "Sign In",
+      title: "SignIn- Student Blog Platform",
       error: "Invalid email or password.",
       currentPage: "signin"
     });
