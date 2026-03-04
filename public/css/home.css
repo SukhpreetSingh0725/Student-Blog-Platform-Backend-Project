@@ -1,4 +1,3 @@
-/* Reset */
 * {
     margin: 0;
     padding: 0;
@@ -14,10 +13,18 @@
   
   /* Hero Section */
   .hero {
-    background: linear-gradient(135deg, #241dad, #2528d7);
+    background: linear-gradient(270deg, #241dad, #2528d7, #4f46e5);
+    background-size: 600% 600%;
     color: white;
     padding: 80px 20px;
     text-align: center;
+    animation: gradientMove 5s ease infinite;
+  }
+
+  @keyframes gradientMove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
   }
   
   .hero-content {
@@ -81,18 +88,63 @@
     gap: 25px;
   }
   
-  /* Blog Card */
   .blog-card {
-    background-color: #fff;
+    position: relative;
+    background: white;
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.38);
     transition: transform 0.3s ease;
+    z-index: 0;
+  }
+  
+  .blog-card::before {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    background-color: #3c8fd8;
+    background-repeat: no-repeat;
+    background-size: 50% 50%, 50% 50%;
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    background-image: conic-gradient(#3587bd, #9839bd, #cc3625, #3498db);
+    animation: rotate 4s linear infinite;
+  }
+  
+  .blog-card::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 2px ;   
+    top: 2px;  
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    background: white;
+    border-radius: 10px;
+  }
+  
+  @keyframes rotate {
+    100% {
+      transform: rotate(1 spherical 360deg);
+      transform: rotate(360deg);
+    }
   }
   
   .blog-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
   }
+
+  
+   
+  
+  
+  
+  
+  
   
   .blog-card h3 {
     margin-bottom: 12px;
@@ -110,8 +162,18 @@
     text-decoration: none;
     color: #4f46e5;
     font-weight: 600;
+    transition: 0.3s;
+  }
+  
+  .blog-card a:hover {
+    letter-spacing: 1px;
   }
 
+  .wave svg {
+    display: block;
+    width: 100%;
+    margin-top: -1px;
+  }
 
 
 
