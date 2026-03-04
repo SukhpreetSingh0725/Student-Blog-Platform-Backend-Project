@@ -111,7 +111,7 @@
     background-repeat: no-repeat;
     background-size: 50% 50%, 50% 50%;
     background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-    background-image: conic-gradient(#3587bd, #9839bd, #cc3625, #3498db);
+    background-image: conic-gradient(#3380b3, #9839bd, #cc3625, #3498db);
     animation: rotate 4s linear infinite;
   }
   
