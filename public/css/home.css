@@ -398,12 +398,55 @@
 }
 
 .about-card {
+  position: relative;
   background: white;
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
+  overflow: hidden; 
+  z-index: 0;
 }
+
+.about-card::before {
+  content: '';
+  position: absolute;
+  width: 150vmax; 
+  height: 150vmax;
+  top: 50%;
+  left: 50%;
+  
+  background-image: conic-gradient(
+    rgba(51, 128, 179, 1), 
+    rgba(152, 57, 189, 1), 
+    rgba(204, 54, 37, 1), 
+    rgba(52, 152, 219, 1), 
+    rgba(51, 128, 179, 1)
+  );
+  
+  animation: rotate-center 4s linear infinite;
+  z-index: -2;
+}
+
+
+.about-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: white;
+  border-radius: 13px;
+  z-index: -1;
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 
 .about-card:hover {
   transform: translateY(-8px);
