@@ -282,7 +282,8 @@
   background: #fff;
   padding: 30px;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgb(48, 83, 198);
+  box-shadow: 0 8px 20px rgba(37, 43, 43, 0.2);
 }
 
 .form-group {
