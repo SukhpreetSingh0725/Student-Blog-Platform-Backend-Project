@@ -274,7 +274,8 @@
   padding: 20px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgb(48, 83, 198);
+  box-shadow: 0 8px 20px rgba(37, 43, 43, 0.2);
 }
 
 .contact-form {
