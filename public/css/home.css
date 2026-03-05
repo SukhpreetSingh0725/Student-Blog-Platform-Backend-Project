@@ -552,3 +552,19 @@
   margin-bottom: 15px;
   text-align: center;
 }
+
+
+.btn-primary1{
+  display: block;
+  margin: auto;
+  padding: 12px 28px;
+  background-color: #9ae3df;
+  color: #1e16b9;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s ease;
+  transform: scale(1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  
+}
