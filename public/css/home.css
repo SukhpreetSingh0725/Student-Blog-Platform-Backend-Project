@@ -285,6 +285,11 @@
   border: 2px solid rgb(48, 83, 198);
   box-shadow: 0 8px 20px rgba(37, 43, 43, 0.2);
 }
+.contact-form h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
 
 .form-group {
   margin-bottom: 20px;
