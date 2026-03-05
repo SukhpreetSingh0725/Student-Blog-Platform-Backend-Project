@@ -527,7 +527,8 @@
   padding: 40px;
   border-radius: 16px;
   width: 350px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  border: 2px solid rgb(48, 83, 198);
+  box-shadow: 0 8px 20px rgba(37, 43, 43, 0.2);
 }
 
 .auth-box h2 {
@@ -540,12 +541,12 @@
   padding: 12px;
   margin-bottom: 15px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #0f5d86;
 }
 
 .error-message {
   background-color: #fee2e2;
-  color: #991b1b;
+  color: #b80e0e;
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 15px;
