@@ -91,60 +91,56 @@
   .blog-card {
     position: relative;
     background: white;
-    padding: 25px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.38);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease;
+    overflow: hidden; 
     z-index: 0;
   }
   
   .blog-card::before {
     content: '';
     position: absolute;
-    z-index: -2;
-    left: -50%;
-    top: -50%;
-    width: 200%;
-    height: 200%;
-    background-color: #3c8fd8;
-    background-repeat: no-repeat;
-    background-size: 50% 50%, 50% 50%;
-    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-    background-image: conic-gradient(#3380b3, #9839bd, #cc3625, #3498db);
-    animation: rotate 4s linear infinite;
+    width: 150vmax; 
+    height: 150vmax;
+    top: 50%;
+    left: 50%;
+    
+    background-image: conic-gradient(
+      rgba(51, 128, 179, 1), 
+      rgba(152, 57, 189, 1), 
+      rgba(204, 54, 37, 1), 
+      rgba(52, 152, 219, 1), 
+      rgba(51, 128, 179, 1)
+    );
+    
+    animation: rotate 2s linear infinite;
+    z-index: -3;
   }
+  
   
   .blog-card::after {
     content: '';
     position: absolute;
-    z-index: -1;
-    left: 2px ;   
-    top: 2px;  
-    width: calc(100% - 4px);
-    height: calc(100% - 4px);
+    inset: 2px;
     background: white;
-    border-radius: 10px;
+    border-radius: 13px;
+    z-index: -1;
   }
   
   @keyframes rotate {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
     100% {
-      transform: rotate(1 spherical 360deg);
-      transform: rotate(360deg);
+      transform: translate(-50%, -50%) rotate(360deg);
     }
   }
-  
+
   .blog-card:hover {
     transform: translateY(-8px);
   }
-
-  
-   
-  
-  
-  
-  
-  
   
   .blog-card h3 {
     margin-bottom: 12px;
@@ -424,8 +420,8 @@
     rgba(51, 128, 179, 1)
   );
   
-  animation: rotate-center 4s linear infinite;
-  z-index: -2;
+  animation: rotate-center 2s linear infinite;
+  z-index: -3;
 }
 
 
