@@ -151,12 +151,12 @@
     font-size: 0.95rem;
     margin-bottom: 15px;
     line-height: 1.5;
-    color: #555;
+    color: #000000;
   }
   
   .blog-card a {
     text-decoration: none;
-    color: #4f46e5;
+    color: #190fde;
     font-weight: 600;
     transition: 0.3s;
   }
@@ -470,7 +470,7 @@
 }
 
 .about-card p {
-  color: #555;
+  color: #000000;
   line-height: 1.6;
 }
 
