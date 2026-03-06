@@ -358,12 +358,20 @@
   text-decoration: none;
   font-weight: 600;
   transition: 0.3s ease;
+  transform: scale(1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary:hover {
-  background-color: #374151;
+  background: linear-gradient(135deg, #5254c6, #6f4bc2);
+  color: white;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30, 22, 185, 0.25);
 }
 
+.btn-secondary:active {
+  transform: scale(0.95);
+}
 
 .about-hero {
   background: linear-gradient(270deg, #241dad, #2528d7, #4f46e5);
