@@ -80,9 +80,10 @@ app.post("/signup", (req, res) => {
   const name = req.body.UserName;
   const email = req.body.UserEmail;
   const password= req.body.password;
+  const confirmPassword = req.body.confirmPassword;
 
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !confirmPassword) {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "All fields are required.",
@@ -102,6 +103,14 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Password must be at least 6 characters.",
+      currentPage: "signup"
+    });
+  }
+
+  if (password !== confirmPassword) {
+    return res.render("signup", {
+      title: "SignUp- Student Blog Platform",
+      error: "Passwords do not match.",
       currentPage: "signup"
     });
   }
