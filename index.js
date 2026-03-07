@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 const PORT = 3000;
+let currentUser = null;
 
 const DATA_FILE=path.join(__dirname,"data","messages.json");
 const USERS_FILE=path.join(__dirname,"data","users.json");
@@ -17,13 +18,15 @@ app.use(express.urlencoded({extended:true}));
 
 app.get("/", (req, res) => {
   res.render("home", {title: "HomePage - Student Blog Platform",
-    currentPage: "home"
+    currentPage: "home",
+    user: currentUser
   });
 });
 
 app.get("/contact", (req, res) => {
   res.render("contact", {title: "ContactPage - Student Blog Platform",
-    currentPage: "contact"
+    currentPage: "contact",
+    user: currentUser
   });
 });
 
@@ -54,6 +57,7 @@ app.post("/contact",(req,res)=>{
   res.render("success",{title: "Message Sent",
     name: req.body.UserName,
     currentPage: "success",
+    user: currentUser,
     message: "Your message has been sent successfully.",
     redirectUrl: "/contact",
     buttonText: "Go Back to Contact"
@@ -64,7 +68,8 @@ app.post("/contact",(req,res)=>{
 app.get("/about", (req, res) => {
   res.render("about", {
     title: "AboutPage - Student Blog Platform",
-    currentPage: "about"
+    currentPage: "about",
+    user: currentUser
   });
 });
 
@@ -72,7 +77,8 @@ app.get("/signup", (req, res) => {
   res.render("signup", {
     title: "SignUp- Student Blog Platform",
     error: null,
-    currentPage: "signup"
+    currentPage: "signup",
+    user: currentUser
   });
 });
 
@@ -87,7 +93,8 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "All fields are required.",
-      currentPage: "signup"
+      currentPage: "signup",
+      user: currentUser
     });
   }
 
@@ -95,7 +102,8 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Invalid email format.",
-      currentPage: "signup"
+      currentPage: "signup",
+      user: currentUser
     });
   }
 
@@ -103,7 +111,8 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Password must be at least 6 characters.",
-      currentPage: "signup"
+      currentPage: "signup",
+      user: currentUser
     });
   }
 
@@ -111,7 +120,8 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Passwords do not match.",
-      currentPage: "signup"
+      currentPage: "signup",
+      user: currentUser
     });
   }
 
@@ -127,7 +137,8 @@ app.post("/signup", (req, res) => {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Email already registered.",
-      currentPage: "signup"
+      currentPage: "signup",
+      user: currentUser
     });
   }
 
@@ -148,7 +159,8 @@ app.post("/signup", (req, res) => {
     currentPage: "success",
     message: "Your account has been created successfully.",
     redirectUrl: "/signin",
-    buttonText: "Go to Sign In"
+    buttonText: "Go to Sign In",
+    user: currentUser
   });
 
 });
@@ -158,7 +170,8 @@ app.get("/signin", (req, res) => {
   res.render("signin", {
     title: "SignIn- Student Blog Platform",
     error: null,
-    currentPage:"signin"
+    currentPage:"signin",
+    user: currentUser
   });
 });
 
@@ -170,7 +183,8 @@ app.post("/signin", (req, res) => {
     return res.render("signin", {
       title: "SignIn- Student Blog Platform",
       error: "All fields are required.",
-      currentPage: "signin"
+      currentPage: "signin",
+      user: currentUser
     });
   }
 
@@ -190,26 +204,62 @@ app.post("/signin", (req, res) => {
     return res.render("signin", {
       title: "SignIn- Student Blog Platform",
       error: "Invalid email or password.",
-      currentPage: "signin"
+      currentPage: "signin",
+      user: currentUser
     });
   }
+  currentUser = user;
+  res.redirect("/profile");
 
+});
 
-  res.render("dashboard", {
-    title: "Dashboard",
-    user: user,
-    currentPage: "dashboard"
+app.get("/profile", (req, res) => {
+
+  if (!currentUser) {
+    return res.redirect("/signin");
+  }
+
+  res.render("profile", {
+    title: "Profile - Student Blog Platform",
+    currentPage: "profile",
+    user: currentUser
   });
 
-  
+});
+
+app.post("/update-profile", (req, res) => {
+
+  const newName = req.body.name;
+  const newPassword = req.body.password;
+  let users = JSON.parse(fs.readFileSync(USERS_FILE));
+  const index = users.findIndex(u => u.email === currentUser.email);
+
+  if (index !== -1) {
+    users[index].name = newName;
+    if (newPassword) {
+      users[index].password = newPassword;
+    }
+    currentUser = users[index];
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  }
+  res.redirect("/profile");
+
+});
+
+app.post("/delete-account", (req, res) => {
+
+  let users = JSON.parse(fs.readFileSync(USERS_FILE));
+  users = users.filter(u => u.email !== currentUser.email);
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  currentUser = null;
+  res.redirect("/signup");
+
 });
 
 
-
 app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/");
-  });
+  currentUser = null;
+  res.redirect("/");
 });
 
 
