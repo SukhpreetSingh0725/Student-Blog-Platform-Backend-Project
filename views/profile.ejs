@@ -13,32 +13,35 @@
    
     <section class="auth-section">
         <div class="auth-box">
-      
-          <h2>My Profile</h2>
-      
-          <div class="profile-info">
+          <div class="profile-section">
+
+            <h2>My Profile</h2>
+            
             <p><strong>Name:</strong> <%= user.name %></p>
             <p><strong>Email:</strong> <%= user.email %></p>
-          </div>
-          
-          <h3>Update Profile</h3>
-          
-          <form action="/update-profile" method="POST">
-            <input type="text" name="name" value="<%= user.name %>" required>
-          
-            <input type="password" name="password" placeholder="New Password">
-          
-            <button type="submit" class="btn-primary1">
-              Update Profile
-            </button>
-          </form>
-          
-          <form action="/delete-account" method="POST">
-            <button class="btn-danger">
-              Delete Account
-            </button>
-          </form>
-        </div>
+            
+            </div>
+            
+            <div class="profile-section">
+            
+            <h3>Update Profile</h3>
+            
+            <form action="/update-profile" method="POST">
+              <input type="text" name="name" placeholder="New Name" required>
+            
+              <input type="password" name="password" placeholder="New Password">
+            
+              <button class="btn-primary1">Update Profile</button>
+            </form>
+            
+            </div>
+            
+            <div class="danger-zone"> 
+            <form action="/delete-account" method="POST">
+              <button class="btn-danger">Delete Account</button>
+            </form>
+            
+            </div>
       </section>
    
     <%- include('partials/footer')%>
