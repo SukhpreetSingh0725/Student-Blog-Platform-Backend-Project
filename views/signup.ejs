@@ -6,20 +6,9 @@
   <title><%= title %></title>
   <link rel="stylesheet" href="/css/home.css" />
 </head>
-
-<script>
-  function togglePassword(id) {
-    const input = document.getElementById(id);
-  
-    if (input.type === "password") {
-      input.type = "text";
-    } else {
-      input.type = "password";
-    }
-  }
-  </script>
-
 <body>
+ 
+
     <%- include("partials/header") %>
 
     <section class="auth-section">
@@ -31,25 +20,29 @@
         <% } %>
     
         <form action="/signup" method="POST">
-          <div class="form-group">
+          <div class="form-group1">
             <label>Full Name </label>
           <input type="text" name="UserName" placeholder="Full Name" required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group1">
             <label>Email Address </label>
             <input type="email" name="UserEmail" placeholder="Email Address" required>
           </div>
   
-          <div class="form-group">
+          <div class="form-group1">
             <label>Password</label>
             <div class="password-box">
               <input type="password" id="password" name="password" placeholder="Password" required>
               <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
             </div>
+          
+          <div class="password-strength">
+            <span id="strengthText"></span>
           </div>
+        </div>
         
-          <div class="form-group">
+          <div class="form-group1">
             <label>Confirm Password</label>
             <div class="password-box">
               <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
@@ -58,11 +51,50 @@
           </div>
         
           <button type="submit" class="btn-primary1">Sign Up</button>
+          <p class="auth-switch">
+            Already have an account?
+            <a href="/signin">Sign In</a>
+          </p>
         </form>
       </div>
     </section>
     
     <%- include("partials/footer") %>
+
+
+    <script>
+      function togglePassword(id) {
+        const input = document.getElementById(id);
+      
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+      
+      const passwordInput = document.getElementById("password");
+      const strengthText = document.getElementById("strengthText");
+      
+      passwordInput.addEventListener("input", function () {
+      
+        const value = passwordInput.value;
+      
+        if (value.length < 6) {
+          strengthText.textContent = "Weak password";
+          strengthText.style.color = "red";
+        } 
+        else if (value.length < 10) {
+          strengthText.textContent = "Medium password";
+          strengthText.style.color = "orange";
+        } 
+        else {
+          strengthText.textContent = "Strong password";
+          strengthText.style.color = "green";
+        }
+      
+      });
+      </script>
 
 
 </body>
