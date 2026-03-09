@@ -26,15 +26,27 @@
   
           <div class="form-group1">
             <label>Password</label>
-          <input type="password" name="password" placeholder="Password" required>
-          </div>
+            <div class="password-box">
+              <input type="password" id="password" name="password" placeholder="Password" required>
+              <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
+            </div>
+        </div>
           <button type="submit" class="btn-primary1">Sign In</button>
         </form>
       </div>
     </section>
     
     <%- include("partials/footer") %>
-
-
+    <script>
+      function togglePassword(id) {
+        const input = document.getElementById(id);
+      
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+      </script>
 </body>
 </html>
