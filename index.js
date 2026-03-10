@@ -31,14 +31,7 @@ app.get("/contact", (req, res) => {
 });
 
 
-app.post("/contact",(req,res)=>{
-  const name = req.body.UserName;
-  const email = req.body.UserEmail;
-  const message= req.body.message;
-
- 
-  
-  
+app.post("/contact",(req,res)=>{ 
   const newMessages={
       name: req.body.UserName,
       email: req.body.UserEmail,
