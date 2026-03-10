@@ -98,7 +98,9 @@ app.post("/signup", (req, res) => {
     });
   }
 
-  if (!email.includes("@")) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
     return res.render("signup", {
       title: "SignUp- Student Blog Platform",
       error: "Invalid email format.",
@@ -209,8 +211,21 @@ app.post("/signin", (req, res) => {
     });
   }
   currentUser = user;
-  res.redirect("/profile");
+  res.redirect("/dashboard");
 
+});
+
+app.get("/dashboard", (req, res) => {
+
+  if (!currentUser) {
+    return res.redirect("/signin");
+  }
+
+  res.render("dashboard", {
+    title: "Dashboard - Student Blog Platform",
+    currentPage: "dashboard",
+    user: currentUser
+  });
 });
 
 app.get("/profile", (req, res) => {
