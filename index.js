@@ -211,7 +211,7 @@ app.post("/signin", (req, res) => {
 app.get("/dashboard", (req, res) => {
 
   if (!currentUser) {
-    return res.redirect("/signin");
+    return res.redirect("/profile");
   }
 
   res.render("dashboard", {

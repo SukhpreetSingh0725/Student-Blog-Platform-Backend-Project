@@ -10,8 +10,11 @@
     "start": "node --watch index"
   },
   "dependencies": {
+    "connect-mongo": "^6.0.0",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
+    "mongoose": "^9.4.1",
+    "multer": "^2.1.1",
     "prompt-sync": "^4.2.0"
   }
 }
