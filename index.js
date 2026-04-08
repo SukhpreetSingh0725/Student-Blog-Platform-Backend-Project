@@ -1,12 +1,9 @@
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
+const mongoose = require("mongoose");
 const app = express();
 const PORT = 3000;
 let currentUser = null;
-
-const DATA_FILE=path.join(__dirname,"data","messages.json");
-const USERS_FILE=path.join(__dirname,"data","users.json");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -14,6 +11,12 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static("public"));
 app.use(express.urlencoded({extended:true}));
 
+mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+const User = require("./models/User");
+const Message = require("./models/Message");
 
 
 app.get("/", (req, res) => {
@@ -31,23 +34,15 @@ app.get("/contact", (req, res) => {
 });
 
 
-app.post("/contact",(req,res)=>{ 
-  const newMessages={
-      name: req.body.UserName,
-      email: req.body.UserEmail,
-      message: req.body.message,
-      date: new Date().toLocaleString()
-  };
-
-  let messages=[];
-  if(fs.existsSync(DATA_FILE)){
-      const fileData = fs.readFileSync(DATA_FILE,"utf-8");
-      messages =JSON.parse(fileData);
-  }
-  messages.push(newMessages);
-  fs.writeFileSync(DATA_FILE,JSON.stringify(messages,null,2));
-
-  res.render("success",{title: "Message Sent",
+app.post("/contact", async (req,res)=>{ 
+  const newMessage = new Message({
+    fullName: req.body.UserName,
+    email: req.body.UserEmail,
+    message: req.body.message
+  });
+  
+await newMessage.save();
+res.render("success",{title: "Message Sent",
     name: req.body.UserName,
     currentPage: "success",
     user: currentUser,
@@ -75,7 +70,7 @@ app.get("/signup", (req, res) => {
   });
 });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async(req, res) => {
   const name = req.body.UserName;
   const email = req.body.UserEmail;
   const password= req.body.password;
@@ -120,13 +115,9 @@ app.post("/signup", (req, res) => {
     });
   }
 
-  let users = [];
+  
 
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
-  }
-
-  const existingUser = users.find(user => user.email === email);
+  const existingUser = await User.findOne({email: email});
 
   if (existingUser) {
     return res.render("signup", {
@@ -137,20 +128,16 @@ app.post("/signup", (req, res) => {
     });
   }
 
-  const newuser={
-    name: req.body.UserName,
-    email: req.body.UserEmail,
-    password: req.body.password,
-    date: new Date().toLocaleString()
-};
-
-  users.push(newuser);
-
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  const newUser = new User({
+    fullName: name,
+    email: email,
+    password: password
+  });
+  await newUser.save();
 
   res.render("success", {
     title: "Account Created",
-    name: req.body.UserName,
+    name: name,
     currentPage: "success",
     message: "Your account has been created successfully.",
     redirectUrl: "/signin",
@@ -170,7 +157,7 @@ app.get("/signin", (req, res) => {
   });
 });
 
-app.post("/signin", (req, res) => {
+app.post("/signin", async (req, res) => {
   const email = req.body.UserEmail;
   const password= req.body.password;
 
@@ -183,19 +170,9 @@ app.post("/signin", (req, res) => {
     });
   }
 
-  let users = [];
+  const user = await User.findOne({ email: email });
 
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
-  }
-
-  const user = users.find(
-    user =>
-      user.email.toLowerCase() === email.toLowerCase() &&
-      user.password === password
-  );
-
-  if (!user) {
+  if (!user || user.password!==password) {
     return res.render("signin", {
       title: "SignIn- Student Blog Platform",
       error: "Invalid email or password.",
@@ -211,7 +188,7 @@ app.post("/signin", (req, res) => {
 app.get("/dashboard", (req, res) => {
 
   if (!currentUser) {
-    return res.redirect("/profile");
+    return res.redirect("/signin");
   }
 
   res.render("dashboard", {
@@ -235,48 +212,44 @@ app.get("/profile", (req, res) => {
 
 });
 
-app.post("/update-profile", (req, res) => {
+app.post("/update-profile", async (req, res) => {
 
   const newName = req.body.name;
   const newPassword = req.body.password;
-  let users = JSON.parse(fs.readFileSync(USERS_FILE));
-  const index = users.findIndex(u => u.email === currentUser.email);
 
-  if (index !== -1) {
-    users[index].name = newName;
+  const user = await User.findOne({ email: currentUser.email });
+
+  if (user) {
+    user.fullName = newName;
+
     if (newPassword) {
-      users[index].password = newPassword;
+      user.password = newPassword;
     }
-    currentUser = users[index];
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+    await user.save();
+    currentUser = user;
   }
+
   res.redirect("/profile");
-
 });
 
-app.post("/delete-account", (req, res) => {
+app.post("/delete-account", async (req, res) => {
 
-  let users = JSON.parse(fs.readFileSync(USERS_FILE));
-  users = users.filter(u => u.email !== currentUser.email);
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  await User.deleteOne({ email: currentUser.email });
+
   currentUser = null;
+
   res.redirect("/signup");
-
 });
-
 
 app.get("/logout", (req, res) => {
   currentUser = null;
   res.redirect("/");
 });
 
-
-
-app.use((req,res)=>{
-    res.status(404).send("<h1>404 - Page Not Found</h1><p> Sorry, we couldn't find that!</p>");
-  
+app.use((req, res) => {
+  res.status(404).send("<h1>404 - Page Not Found</h1>");
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
