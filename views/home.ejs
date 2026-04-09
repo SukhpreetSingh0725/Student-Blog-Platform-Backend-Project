@@ -1,73 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/home.css">
-    <title><%=title %></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/home.css">
+  <title><%= title %></title>
 </head>
 <body>
 
-   
-    <%- include('partials/header')%>
-    <section class="hero">
-        <div class="hero-content">
-          <h1>Read. Write. Inspire.</h1>
-          <p>
-            A modern blogging platform where students share ideas,
-            experiences, and knowledge.
-          </p>
-          <a href="#" class="btn-primary">Explore Blogs</a>
-        </div>
-      </section>
-      <div class="wave">
-        <svg viewBox="0 0 1440 120">
-          <path fill="#2528d7" fill-opacity="1"
-            d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,53.3C840,53,960,75,1080,85.3C1200,96,1320,96,1380,96L1440,96L1440,120L0,120Z">
-          </path>
-        </svg>
-      </div>
+  <%- include('partials/header') %>
 
-      <section class="blogs">
-        <h2>Latest Blogs</h2>
-    
-        <div class="blog-grid">
-          <div class="blog-card ">
-            <h3>Getting Started with Web Development</h3>
-            <p>
-              Learn the basics of HTML, CSS, and JavaScript and start
-              your web development journey today.
-            </p>
-            <a href="#">Read More →</a>
-          </div>
-    
-          <div class="blog-card">
-            <h3>Why Every Student Should Learn Coding</h3>
-            <p>
-              Coding improves problem-solving skills and opens doors
-              to multiple career opportunities.
-            </p>
-            <a href="#">Read More →</a>
-          </div>
-    
-          <div class="blog-card">
-            <h3>Backend vs Frontend Development</h3>
-            <p>
-              Understand the difference between frontend and backend
-              development with real examples.
-            </p>
-            <a href="#">Read More →</a>
-          </div>
-        </div>
-      </section>
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Read. Write. Inspire.</h1>
+      <p>
+        A modern blogging platform where students share ideas,
+        experiences, and knowledge.
+      </p>
+      <a href="/blogs" class="btn-primary">Explore Blogs</a>
+    </div>
+  </section>
 
-   
-    
-   
-   
-    <%- include('partials/footer')%>
- 
-    
-   
+  <div class="wave">
+    <svg viewBox="0 0 1440 120">
+      <path fill="#2528d7" fill-opacity="1"
+        d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,53.3C840,53,960,75,1080,85.3C1200,96,1320,96,1380,96L1440,96L1440,120L0,120Z">
+      </path>
+    </svg>
+  </div>
+
+  <section class="blogs">
+    <h2>Latest Blogs</h2>
+    <div class="blog-grid">
+
+      <% if (blogs && blogs.length > 0) { %>
+        <% blogs.forEach(blog => { %>
+          <div class="blog-card">
+            <h3><%= blog.title %></h3>
+            <p><%= blog.content.substring(0, 120) %>...</p>
+            <small>By <%= blog.author.fullName %></small>
+            <a href="/blogs/<%= blog._id %>">Read More →</a>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="no-blogs">No blogs yet. Be the first to write one!</p>
+      <% } %>
+
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
 </body>
 </html>

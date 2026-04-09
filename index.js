@@ -26,16 +26,29 @@ mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
 
 const User = require("./models/User");
 const Message = require("./models/Message");
+// const Blog = require("./models/Blog");
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
 
-app.get("/", (req, res) => {
-  res.render("home", {title: "HomePage - Student Blog Platform",
-    currentPage: "home",
-  });
+app.get("/", async (req, res) => {
+  try {
+    // const blogs = await Blog.find()
+    //   .populate("author", "fullName")
+    //   .sort({ createdAt: -1 })   
+    //   .limit(3);        
+
+    res.render("home", {
+      title: "HomePage - Student Blog Platform",
+      currentPage: "home",
+      blogs:[]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
 });
 
 app.get("/contact", (req, res) => {
