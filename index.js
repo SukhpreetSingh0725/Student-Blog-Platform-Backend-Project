@@ -1,15 +1,24 @@
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
 const app = express();
 const PORT = 3000;
-let currentUser = null;
+
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static("public"));
 app.use(express.urlencoded({extended:true}));
+
+app.use(session({
+  secret: "student_blog_secret_key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 12 }
+}));
 
 mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
 .then(() => console.log("MongoDB Connected"))
@@ -18,38 +27,56 @@ mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
 const User = require("./models/User");
 const Message = require("./models/Message");
 
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
 app.get("/", (req, res) => {
   res.render("home", {title: "HomePage - Student Blog Platform",
     currentPage: "home",
-    user: currentUser
   });
 });
 
 app.get("/contact", (req, res) => {
   res.render("contact", {title: "ContactPage - Student Blog Platform",
     currentPage: "contact",
-    user: currentUser
   });
 });
 
 
-app.post("/contact", async (req,res)=>{ 
-  const newMessage = new Message({
-    fullName: req.body.UserName,
-    email: req.body.UserEmail,
-    message: req.body.message
-  });
-  
-await newMessage.save();
-res.render("success",{title: "Message Sent",
-    name: req.body.UserName,
-    currentPage: "success",
-    user: currentUser,
-    message: "Your message has been sent successfully.",
-    redirectUrl: "/contact",
-    buttonText: "Go Back to Contact"
-  });
+app.post("/contact", async (req, res) => {
+  try {
+    const { UserName, UserEmail, message } = req.body;
+
+    if (!UserName || !UserEmail || !message) {
+      return res.render("contact", {
+        title: "ContactPage - Student Blog Platform",
+        currentPage: "contact",
+        error: "All fields are required."
+      });
+    }
+
+    const newMessage = new Message({
+      fullName: UserName,
+      email: UserEmail,
+      message: message
+    });
+
+    await newMessage.save();
+
+    res.render("success", {
+      title: "Message Sent",
+      name: UserName,
+      currentPage: "success",
+      message: "Your message has been sent successfully.",
+      redirectUrl: "/contact",
+      buttonText: "Go Back to Contact"
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
 });
 
 
@@ -57,7 +84,6 @@ app.get("/about", (req, res) => {
   res.render("about", {
     title: "AboutPage - Student Blog Platform",
     currentPage: "about",
-    user: currentUser
   });
 });
 
@@ -66,86 +92,72 @@ app.get("/signup", (req, res) => {
     title: "SignUp- Student Blog Platform",
     error: null,
     currentPage: "signup",
-    user: currentUser
   });
 });
 
-app.post("/signup", async(req, res) => {
-  const name = req.body.UserName;
-  const email = req.body.UserEmail;
-  const password= req.body.password;
-  const confirmPassword = req.body.confirmPassword;
+app.post("/signup", async (req, res) => {
+  try {
+    const { UserName: name, UserEmail: email, password, confirmPassword } = req.body;
 
+    if (!name || !email || !password || !confirmPassword) {
+      return res.render("signup", {
+        title: "SignUp - Student Blog Platform",
+        error: "All fields are required.",
+        currentPage: "signup"
+      });
+    }
 
-  if (!name || !email || !password || !confirmPassword) {
-    return res.render("signup", {
-      title: "SignUp- Student Blog Platform",
-      error: "All fields are required.",
-      currentPage: "signup",
-      user: currentUser
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.render("signup", {
+        title: "SignUp - Student Blog Platform",
+        error: "Invalid email format.",
+        currentPage: "signup"
+      });
+    }
+
+    if (password.length < 6) {
+      return res.render("signup", {
+        title: "SignUp - Student Blog Platform",
+        error: "Password must be at least 6 characters.",
+        currentPage: "signup"
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.render("signup", {
+        title: "SignUp - Student Blog Platform",
+        error: "Passwords do not match.",
+        currentPage: "signup"
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.render("signup", {
+        title: "SignUp - Student Blog Platform",
+        error: "Email already registered.",
+        currentPage: "signup"
+      });
+    }
+
+    const newUser = new User({ fullName: name, email, password });
+    await newUser.save();
+
+    res.render("success", {
+      title: "Account Created",
+      name,
+      currentPage: "success",
+      message: "Your account has been created successfully.",
+      redirectUrl: "/signin",
+      buttonText: "Go to Sign In"
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(email)) {
-    return res.render("signup", {
-      title: "SignUp- Student Blog Platform",
-      error: "Invalid email format.",
-      currentPage: "signup",
-      user: currentUser
-    });
-  }
-
-  if (password.length < 6) {
-    return res.render("signup", {
-      title: "SignUp- Student Blog Platform",
-      error: "Password must be at least 6 characters.",
-      currentPage: "signup",
-      user: currentUser
-    });
-  }
-
-  if (password !== confirmPassword) {
-    return res.render("signup", {
-      title: "SignUp- Student Blog Platform",
-      error: "Passwords do not match.",
-      currentPage: "signup",
-      user: currentUser
-    });
-  }
-
-  
-
-  const existingUser = await User.findOne({email: email});
-
-  if (existingUser) {
-    return res.render("signup", {
-      title: "SignUp- Student Blog Platform",
-      error: "Email already registered.",
-      currentPage: "signup",
-      user: currentUser
-    });
-  }
-
-  const newUser = new User({
-    fullName: name,
-    email: email,
-    password: password
-  });
-  await newUser.save();
-
-  res.render("success", {
-    title: "Account Created",
-    name: name,
-    currentPage: "success",
-    message: "Your account has been created successfully.",
-    redirectUrl: "/signin",
-    buttonText: "Go to Sign In",
-    user: currentUser
-  });
-
 });
+
 
 
 app.get("/signin", (req, res) => {
@@ -153,97 +165,93 @@ app.get("/signin", (req, res) => {
     title: "SignIn- Student Blog Platform",
     error: null,
     currentPage:"signin",
-    user: currentUser
   });
 });
 
 app.post("/signin", async (req, res) => {
-  const email = req.body.UserEmail;
-  const password= req.body.password;
+  try {
+    const { UserEmail: email, password } = req.body;
 
-  if (!email || !password) {
-    return res.render("signin", {
-      title: "SignIn- Student Blog Platform",
-      error: "All fields are required.",
-      currentPage: "signin",
-      user: currentUser
-    });
-  }
-
-  const user = await User.findOne({ email: email });
-
-  if (!user || user.password!==password) {
-    return res.render("signin", {
-      title: "SignIn- Student Blog Platform",
-      error: "Invalid email or password.",
-      currentPage: "signin",
-      user: currentUser
-    });
-  }
-  currentUser = user;
-  res.redirect("/dashboard");
-
-});
-
-app.get("/dashboard", (req, res) => {
-
-  if (!currentUser) {
-    return res.redirect("/signin");
-  }
-
-  res.render("dashboard", {
-    title: "Dashboard - Student Blog Platform",
-    currentPage: "dashboard",
-    user: currentUser
-  });
-});
-
-app.get("/profile", (req, res) => {
-
-  if (!currentUser) {
-    return res.redirect("/signin");
-  }
-
-  res.render("profile", {
-    title: "Profile - Student Blog Platform",
-    currentPage: "profile",
-    user: currentUser
-  });
-
-});
-
-app.post("/update-profile", async (req, res) => {
-
-  const newName = req.body.name;
-  const newPassword = req.body.password;
-
-  const user = await User.findOne({ email: currentUser.email });
-
-  if (user) {
-    user.fullName = newName;
-
-    if (newPassword) {
-      user.password = newPassword;
+    if (!email || !password) {
+      return res.render("signin", {
+        title: "SignIn - Student Blog Platform",
+        error: "All fields are required.",
+        currentPage: "signin"
+      });
     }
 
-    await user.save();
-    currentUser = user;
-  }
+    const user = await User.findOne({ email });
+    const isMatch = user && await user.comparePassword(password);
 
-  res.redirect("/profile");
+    if (!isMatch) {
+      return res.render("signin", {
+        title: "SignIn - Student Blog Platform",
+        error: "Invalid email or password.",
+        currentPage: "signin"
+      });
+    }
+
+    req.session.user = user;
+    res.redirect("/dashboard");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
 });
 
-app.post("/delete-account", async (req, res) => {
+function isLoggedIn(req, res, next) {
+  if (!req.session.user) return res.redirect("/signin");
+  next();
+}
 
-  await User.deleteOne({ email: currentUser.email });
+app.get("/dashboard", isLoggedIn, (req, res) => {
+  res.render("dashboard", {
+    title: "Dashboard - Student Blog Platform",
+    currentPage: "dashboard"
+  });
+});
 
-  currentUser = null;
+app.get("/profile", isLoggedIn, (req, res) => {
+  res.render("profile", {
+    title: "Profile - Student Blog Platform",
+    currentPage: "profile"
+  });
+});
 
-  res.redirect("/signup");
+app.post("/update-profile", isLoggedIn, async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const user = await User.findOne({ email: req.session.user.email });
+
+    if (user) {
+      user.fullName = name;
+      if (password) {
+        user.password = password;
+      }
+      await user.save();
+      req.session.user = user;
+    }
+
+    res.redirect("/profile");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
+});
+
+app.post("/delete-account", isLoggedIn, async (req, res) => {
+  try {
+    await User.deleteOne({ email: req.session.user.email });
+    req.session.destroy(); 
+    res.redirect("/signup");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
 });
 
 app.get("/logout", (req, res) => {
-  currentUser = null;
+  req.session.destroy(); 
   res.redirect("/");
 });
 
