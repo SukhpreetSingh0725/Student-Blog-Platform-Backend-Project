@@ -1,52 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/home.css">
-    <title><%=title %></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/home.css">
+  <title><%= title %></title>
 </head>
 <body>
 
-   
-    <%- include('partials/header')%>
-   
-    <section class="auth-section">
-        <div class="auth-box">
-          <div class="profile-section">
+  <%- include('partials/header') %>
 
-            <h2>My Profile</h2>
-            
-            <p><strong>Name:</strong> <%= user.fullName %></p>
-            <p><strong>Email:</strong> <%= user.email %></p>
-            
-            </div>
-            
-            <div class="profile-section">
-            
-            <h3>Update Profile</h3>
-            
-            <form action="/update-profile" method="POST">
-              <input type="text" name="name" placeholder="New Name" required>
-            
-              <input type="password" name="password" placeholder="New Password">
-            
-              <button class="btn-primary1">Update Profile</button>
-            </form>
-            
-            </div>
-            
-            <div class="danger-zone"> 
-            <form action="/delete-account" method="POST">
-              <button class="btn-danger">Delete Account</button>
-            </form>
-            
-            </div>
-      </section>
-   
-    <%- include('partials/footer')%>
- 
-    
-   
+  <section class="auth-section">
+    <div class="auth-box">
+
+      <div class="profile-section">
+        <h2>My Profile</h2>
+        <p><strong>Name:</strong> <%= user.fullName %></p>
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Member Since:</strong> <%= new Date(user.createdAt).toDateString() %></p>
+      </div>
+
+      <div class="profile-section">
+        <h3>Update Profile</h3>
+
+        <% if (typeof success !== 'undefined' && success) { %>
+          <p class="success-msg">Profile updated successfully!</p>
+        <% } %>
+
+        <form action="/update-profile" method="POST">
+          <input
+            type="text"
+            name="name"
+            value="<%= user.fullName %>"
+            placeholder="New Name"
+            required
+          >
+          <input
+            type="password"
+            name="password"
+            placeholder="New Password (leave blank to keep current)"
+          >
+          <button class="btn-primary1">Update Profile</button>
+        </form>
+      </div>
+
+      <div class="danger-zone">
+        <h3>Danger Zone</h3>
+        <p>Deleting your account is permanent and cannot be undone.</p>
+        <form action="/delete-account" method="POST">
+          <button
+            class="btn-danger"
+            onclick="return confirm('Are you sure? This will permanently delete your account!')">
+            Delete Account
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
 </body>
 </html>
