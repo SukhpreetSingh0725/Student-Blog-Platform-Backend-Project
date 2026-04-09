@@ -7,46 +7,69 @@
   <link rel="stylesheet" href="/css/home.css" />
 </head>
 <body>
-    <%- include("partials/header") %>
 
-    <section class="auth-section">
-      <div class="auth-box">
-        <h2>Welcome Back</h2>
-    
-        <% if (locals.error) { %>
-          <div class="error-message"><%= error %></div>
-        <% } %>
-    
-        <form action="/signin" method="POST">
+  <%- include("partials/header") %>
 
-          <div class="form-group1">
-            <label>Email Address </label>
-            <input type="email" name="UserEmail" placeholder="Email Address" required>
-          </div>
-  
-          <div class="form-group1">
-            <label>Password</label>
-            <div class="password-box">
-              <input type="password" id="password" name="password" placeholder="Password" required>
-              <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
-            </div>
+  <section class="auth-section">
+    <div class="auth-box">
+      <h2>Welcome Back</h2>
+
+      <% if (locals.error) { %>
+        <div class="error-message"><%= error %></div>
+      <% } %>
+
+      <form action="/signin" method="POST">
+
+        <div class="form-group1">
+          <label>Email Address</label>
+          <input
+            type="email"
+            name="UserEmail"
+            placeholder="Email Address"
+            value="<%= typeof emailValue !== 'undefined' ? emailValue : '' %>"
+            required
+          >
         </div>
-          <button type="submit" class="btn-primary1">Sign In</button>
-        </form>
+
+        <div class="form-group1">
+          <label>Password</label>
+          <div class="password-box">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+            >
+            <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary1">Sign In</button>
+
+      </form>
+      <div class="auth-links">
+        <a href="/signup">Don't have an account? Sign Up</a>
       </div>
-    </section>
-    
-    <%- include("partials/footer") %>
-    <script>
-      function togglePassword(id) {
-        const input = document.getElementById(id);
-      
-        if (input.type === "password") {
-          input.type = "text";
-        } else {
-          input.type = "password";
-        }
+
+    </div>
+  </section>
+
+  <%- include("partials/footer") %>
+
+  <script>
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      const eye = document.querySelector('.toggle-eye');
+      if (input.type === "password") {
+        input.type = "text";
+        eye.textContent = "🙈";
+      } else {
+        input.type = "password";
+        eye.textContent = "👁";
       }
-      </script>
+    }
+  </script>
+
 </body>
 </html>

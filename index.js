@@ -189,7 +189,8 @@ app.post("/signin", async (req, res) => {
       return res.render("signin", {
         title: "SignIn - Student Blog Platform",
         error: "All fields are required.",
-        currentPage: "signin"
+        currentPage: "signin",
+        emailValue: email
       });
     }
 
@@ -200,7 +201,8 @@ app.post("/signin", async (req, res) => {
       return res.render("signin", {
         title: "SignIn - Student Blog Platform",
         error: "Invalid email or password.",
-        currentPage: "signin"
+        currentPage: "signin",
+        emailValue: email
       });
     }
 
@@ -245,7 +247,11 @@ app.post("/update-profile", isLoggedIn, async (req, res) => {
       req.session.user = user;
     }
 
-    res.redirect("/profile");
+    res.render("profile", {
+      title: "Profile - Student Blog Platform",
+      currentPage: "profile",
+      success: true
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Something went wrong. Please try again.");
