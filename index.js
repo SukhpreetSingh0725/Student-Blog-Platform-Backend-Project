@@ -116,7 +116,8 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", {
         title: "SignUp - Student Blog Platform",
         error: "All fields are required.",
-        currentPage: "signup"
+        currentPage: "signup",
+        formData: { name, email }
       });
     }
 
