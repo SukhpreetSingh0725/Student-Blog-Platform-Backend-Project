@@ -1,26 +1,25 @@
 <header class="navbar">
-    <div class="nav-container">
-      
+  <div class="nav-container">
 
-      <div class="logo">
-        <a href="/">StudentBlog</a>
-      </div>
-  
-
-      <nav class="nav-links">
-        <a href="/" class="<%= currentPage === 'home' ? 'active' : '' %>">Home</a>
-        <a href="/about" class="<%= currentPage === 'about' ? 'active' : '' %>">About</a>
-        <a href="/contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">Contact</a>
-
-        <% if (user) { %>
-          <a href="/profile" class=" <%= currentPage === 'profile' ? 'active' : '' %>">Profile</a>
-          <a href="/logout" class="btn-nav">Logout</a>
-        <% } else { %>
-        <a href="/signin" class="<%= currentPage === 'signin' ? 'active' : '' %>">Sign In</a>
-        <a href="/signup" class="btn-nav <%= currentPage === 'sign up' ? 'active' : '' %>">Sign Up</a>
-        <% } %>
-
-      </nav>
-  
+    <div class="logo">
+      <a href="/">StudentBlog</a>
     </div>
-  </header>
+
+    <nav class="nav-links">
+      <a href="/" class="<%= currentPage === 'home' ? 'active' : '' %>">Home</a>
+      <a href="/about" class="<%= currentPage === 'about' ? 'active' : '' %>">About</a>
+      <a href="/blogs" class="<%= currentPage === 'blogs' ? 'active' : '' %>">Blogs</a>
+      <a href="/contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">Contact</a>
+
+      <% if (user) { %>
+        <a href="/profile" class="<%= currentPage === 'profile' ? 'active' : '' %>">Profile</a>
+        <a href="/logout" class="btn-nav">Logout</a>
+      <% } else { %>
+        <a href="/signin" class="<%= currentPage === 'signin' ? 'active' : '' %>">Sign In</a>
+        <a href="/signup" class="btn-nav <%= currentPage === 'signup' ? 'active' : '' %>">Sign Up</a>
+      <% } %>
+
+    </nav>
+
+  </div>
+</header>
