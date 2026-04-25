@@ -139,7 +139,7 @@ app.get("/signup", (req, res) => {
   });
 });
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", upload.single("profilePic"), async (req, res) => {
   try {
     const { UserName: name, UserEmail: email, password, confirmPassword } = req.body;
 
@@ -157,7 +157,8 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", {
         title: "SignUp - Student Blog Platform",
         error: "Invalid email format.",
-        currentPage: "signup"
+        currentPage: "signup",
+        formData: { name, email }
       });
     }
 
@@ -165,7 +166,8 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", {
         title: "SignUp - Student Blog Platform",
         error: "Password must be at least 6 characters.",
-        currentPage: "signup"
+        currentPage: "signup",
+        formData: { name, email }
       });
     }
 
@@ -173,7 +175,8 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", {
         title: "SignUp - Student Blog Platform",
         error: "Passwords do not match.",
-        currentPage: "signup"
+        currentPage: "signup",
+        formData: { name, email }
       });
     }
 
@@ -182,11 +185,18 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", {
         title: "SignUp - Student Blog Platform",
         error: "Email already registered.",
-        currentPage: "signup"
+        currentPage: "signup",
+        formData: { name, email }
       });
     }
+    const profilePic = req.file ? req.file.filename : "default-avatar.png";
 
-    const newUser = new User({ fullName: name, email, password });
+    const newUser = new User({ 
+      fullName: name, 
+      email, 
+      password,
+      profilePic 
+    });
     await newUser.save();
 
     res.render("success", {
