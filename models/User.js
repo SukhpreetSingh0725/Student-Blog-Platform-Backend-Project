@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "default-avatar.png"
     },
+    googleId: {
+      type: String,
+      default: null
+    },
     date: { type: Date, default: Date.now }
   },
   {collection: "users",}

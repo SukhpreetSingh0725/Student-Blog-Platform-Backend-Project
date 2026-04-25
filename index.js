@@ -5,6 +5,11 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const multer = require("multer");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = "student_blog_jwt_secret_key";
+const cookieParser = require("cookie-parser");
+const passport = require("passport");
+require("dotenv").config();
 const app = express();
 const PORT = 3000;
 
@@ -14,6 +19,7 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
+app.use(cookieParser());
 app.use(express.urlencoded({extended:true}));
 
 app.use(session({
@@ -25,6 +31,12 @@ app.use(session({
     mongoUrl: "mongodb://127.0.0.1:27017/student_blog"
   })
 }));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+require("./auth/google")(passport); 
 
 mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
 .then(() => console.log("MongoDB Connected"))
@@ -247,6 +259,16 @@ app.post("/signin", async (req, res) => {
         emailValue: email
       });
     }
+    const token = jwt.sign(
+      { id: user._id, email: user.email, fullName: user.fullName },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000
+    });
 
     req.session.user = user;
     res.redirect("/dashboard");
@@ -257,8 +279,22 @@ app.post("/signin", async (req, res) => {
 });
 
 function isLoggedIn(req, res, next) {
-  if (!req.session.user) return res.redirect("/signin");
-  next();
+  const token = req.cookies?.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+      return next();
+    } catch (err) {
+      res.clearCookie("token");
+    }
+  }
+  if (req.session.user) {
+    return next();
+  }
+
+  res.redirect("/signin");
 }
 
 app.get("/dashboard", isLoggedIn, (req, res) => {
@@ -275,7 +311,7 @@ app.get("/profile", isLoggedIn, (req, res) => {
   });
 });
 
-app.post("/update-profile", isLoggedIn, async (req, res) => {
+app.post("/update-profile", isLoggedIn, upload.single("profilePic"), async (req, res) => {
   try {
     const { name, password } = req.body;
     const user = await User.findOne({ email: req.session.user.email });
@@ -284,6 +320,9 @@ app.post("/update-profile", isLoggedIn, async (req, res) => {
       user.fullName = name;
       if (password) {
         user.password = password;
+      }
+      if (req.file) {
+        user.profilePic = req.file.filename;
       }
       await user.save();
       req.session.user = user;
@@ -311,10 +350,39 @@ app.post("/delete-account", isLoggedIn, async (req, res) => {
   }
 });
 
+
 app.get("/logout", (req, res) => {
-  req.session.destroy(); 
-  res.redirect("/");
+  res.clearCookie("token"); 
+  res.clearCookie("connect.sid"); 
+  req.session.destroy((err) => { 
+    if (err) console.error(err);
+    res.redirect("/");
+  });
 });
+
+app.get("/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/signin" }),
+  async (req, res) => {
+    req.session.user = req.user;
+
+    const token = jwt.sign(
+      { id: req.user._id, email: req.user.email, fullName: req.user.fullName },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.redirect("/dashboard");
+  }
+);
 
 app.use((req, res) => {
   res.status(404).send("<h1>404 - Page Not Found</h1>");
