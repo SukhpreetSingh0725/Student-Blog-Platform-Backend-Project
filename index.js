@@ -3,6 +3,8 @@ const path = require("path");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
+const multer = require("multer");
 const app = express();
 const PORT = 3000;
 
@@ -11,13 +13,17 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
 app.use(express.urlencoded({extended:true}));
 
 app.use(session({
   secret: "student_blog_secret_key",
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 12 }
+  cookie: { maxAge: 1000 * 60 * 60 * 12 },
+  store: MongoStore.create({      
+    mongoUrl: "mongodb://127.0.0.1:27017/student_blog"
+  })
 }));
 
 mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
@@ -32,6 +38,31 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only images are allowed!"), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }
+});
+
 
 app.get("/", async (req, res) => {
   try {

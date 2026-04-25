@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"]
     },
+    profilePic: {
+      type: String,
+      default: "default-avatar.png"
+    },
     date: { type: Date, default: Date.now }
   },
   {collection: "users",}
