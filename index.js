@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -9,7 +10,6 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "student_blog_jwt_secret_key";
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-require("dotenv").config();
 const app = express();
 const PORT = 3000;
 
@@ -45,10 +45,30 @@ mongoose.connect("mongodb://127.0.0.1:27017/student_blog")
 const User = require("./models/User");
 const Message = require("./models/Message");
 const Blog = require("./models/Blog");
+app.use(async (req, res, next) => {
+  try {
+    if (req.session.user) {
+      const user = await User.findById(req.session.user._id);
+      res.locals.user = user;
+      return next();
+    }
 
-app.use((req, res, next) => {
-  res.locals.user = req.session.user || null;
-  next();
+
+    const token = req.cookies?.token;
+    if (token) {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      res.locals.user = user;
+      req.session.user = user;
+      return next();
+    }
+
+    res.locals.user = null;
+    next();
+  } catch (err) {
+    res.locals.user = null;
+    next();
+  }
 });
 
 const storage = multer.diskStorage({
