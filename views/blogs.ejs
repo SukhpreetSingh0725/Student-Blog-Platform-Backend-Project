@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+
+  <%- include("partials/header") %>
+
+  <section class="blogs-hero">
+    <div class="hero-content">
+      <h1>Student Blogs</h1>
+      <p>Read, share and inspire with your fellow students.</p>
+      <% if (user) { %>
+        <a href="/blogs/create" class="btn-primary">✏️ Write a Blog</a>
+      <% } else { %>
+        <a href="/signin" class="btn-primary">Sign In to Write</a>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="blogs">
+    <h2>All Blogs</h2>
+
+    <div class="blog-grid">
+      <% if (blogs && blogs.length > 0) { %>
+        <% blogs.forEach(blog => { %>
+          <div class="blog-card">
+
+            <% if (blog.coverImage) { %>
+              <img src="/uploads/<%= blog.coverImage %>" alt="Cover"
+                style="width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:12px;">
+            <% } %>
+
+            <h3><%= blog.title %></h3>
+            <p><%= blog.content.substring(0, 120) %>...</p>
+
+            <div class="blog-meta">
+              <img src="/uploads/<%= blog.author.profilePic %>" alt="avatar"
+                style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+              <small>By <strong><%= blog.author.fullName %></strong></small>
+              <small><%= new Date(blog.createdAt).toDateString() %></small>
+            </div>
+
+            <div class="blog-footer">
+              <span>❤️ <%= blog.likes.length %></span>
+              <span>💬 <%= blog.comments.length %></span>
+              <a href="/blogs/<%= blog._id %>">Read More →</a>
+            </div>
+
+            <% if (blog.tags && blog.tags.length > 0) { %>
+              <div class="blog-tags">
+                <% blog.tags.forEach(tag => { %>
+                  <span class="tag">#<%= tag %></span>
+                <% }) %>
+              </div>
+            <% } %>
+
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="no-blogs-box">
+          <p>No blogs yet. Be the first to write one!</p>
+          <% if (user) { %>
+            <a href="/blogs/create" class="btn-primary">✏️ Write First Blog</a>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <%- include("partials/footer") %>
+
+</body>
+</html>
