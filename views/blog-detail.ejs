@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+
+  <%- include("partials/header") %>
+
+  <section class="blog-detail-section">
+    <div class="blog-detail-box">
+
+      <% if (blog.coverImage) { %>
+        <img src="/uploads/<%= blog.coverImage %>" alt="Cover"
+          style="width:100%; max-height:400px; object-fit:cover; border-radius:12px; margin-bottom:25px;">
+      <% } %>
+
+      <h1 class="blog-detail-title"><%= blog.title %></h1>
+
+      <div class="blog-meta" style="margin-bottom:20px;">
+        <img src="/uploads/<%= blog.author.profilePic %>" alt="avatar"
+          style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+        <div>
+          <strong><%= blog.author.fullName %></strong>
+          <small style="display:block; color:#6b7280;"><%= new Date(blog.createdAt).toDateString() %></small>
+        </div>
+      </div>
+
+      <% if (blog.tags && blog.tags.length > 0) { %>
+        <div class="blog-tags" style="margin-bottom:20px;">
+          <% blog.tags.forEach(tag => { %>
+            <span class="tag">#<%= tag %></span>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <div class="blog-content">
+        <%- blog.content.replace(/\n/g, '<br>') %>
+      </div>
+
+      <div class="blog-actions">
+
+        <% if (user) { %>
+          <form action="/blogs/<%= blog._id %>/like" method="POST" style="display:inline;">
+            <button class="btn-like">
+              ❤️ <%= blog.likes.length %> Likes
+            </button>
+          </form>
+        <% } else { %>
+          <span class="btn-like">❤️ <%= blog.likes.length %> Likes</span>
+        <% } %>
+
+        <% if (user && blog.author._id.toString() === user._id.toString()) { %>
+          <a href="/blogs/<%= blog._id %>/edit" class="btn-primary1" style="padding:8px 20px;">Edit</a>
+          <form action="/blogs/<%= blog._id %>/delete" method="POST" style="display:inline;">
+            <button class="btn-danger" style="margin:0;"
+              onclick="return confirm('Delete this blog?')">Delete</button>
+          </form>
+        <% } %>
+
+      </div>
+
+      <div class="comments-section">
+        <h3>💬 Comments (<%= blog.comments.length %>)</h3>
+
+  
+        <% if (user) { %>
+          <form action="/blogs/<%= blog._id %>/comment" method="POST" class="comment-form">
+            <textarea name="text" rows="3" placeholder="Write a comment..." required></textarea>
+            <button type="submit" class="btn-primary1" style="margin-top:8px;">Post Comment</button>
+          </form>
+        <% } else { %>
+          <p style="color:#6b7280;"><a href="/signin">Sign in</a> to leave a comment.</p>
+        <% } %>
+        <div class="comments-list">
+          <% if (blog.comments.length > 0) { %>
+            <% blog.comments.forEach(comment => { %>
+              <div class="comment-card">
+                <div class="comment-header">
+                  <img src="/uploads/<%= comment.user.profilePic %>" alt="avatar"
+                    style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                  <div>
+                    <strong><%= comment.user.fullName %></strong>
+                    <small style="display:block; color:#6b7280;">
+                      <%= new Date(comment.createdAt).toDateString() %>
+                    </small>
+                  </div>
+                </div>
+                <p class="comment-text"><%= comment.text %></p>
+
+                <% if (user && comment.user._id.toString() === user._id.toString()) { %>
+                  <form action="/blogs/<%= blog._id %>/comment/<%= comment._id %>/delete" method="POST">
+                    <button class="btn-delete-comment">🗑 Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p style="color:#6b7280; margin-top:15px;">No comments yet. Be the first!</p>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include("partials/footer") %>
+
+</body>
+</html>
