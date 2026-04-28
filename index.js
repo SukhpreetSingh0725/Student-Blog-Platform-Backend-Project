@@ -413,7 +413,8 @@ app.get("/blogs", async (req, res) => {
     res.render("blogs", {
       title: "Blogs - Student Blog Platform",
       currentPage: "blogs",
-      blogs
+      blogs,
+      searchQuery: ""
     });
   } catch (err) {
     console.error(err);
@@ -454,6 +455,35 @@ app.post("/blogs/create", isLoggedIn, upload.single("coverImage"), async (req, r
 
     await newBlog.save();
     res.redirect("/blogs");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+// ✅ Search blogs
+app.get("/blogs/search", async (req, res) => {
+  try {
+    const query = req.query.q;
+
+    if (!query) return res.redirect("/blogs");
+
+    const blogs = await Blog.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { content: { $regex: query, $options: "i" } }
+      ]
+    })
+    .populate("author", "fullName profilePic")
+    .sort({ createdAt: -1 });
+
+    res.render("blogs", {
+      title: `Search: ${query} - Student Blog Platform`,
+      currentPage: "blogs",
+      blogs,
+      searchQuery: query
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Something went wrong.");

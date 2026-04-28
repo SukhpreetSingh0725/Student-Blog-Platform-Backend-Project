@@ -22,8 +22,28 @@
     </div>
   </section>
 
+  <div class="search-bar">
+    <form action="/blogs/search" method="GET">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search blogs by title, tag or keyword..."
+        value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+      >
+      <button type="submit">🔍 Search</button>
+    </form>
+  </div>
+
+  <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+    <p class="search-info">
+      Showing results for: <strong>"<%= searchQuery %>"</strong>
+      (<%= blogs.length %> found)
+      <a href="/blogs">✕ Clear</a>
+    </p>
+  <% } %>
+
   <section class="blogs">
-    <h2>All Blogs</h2>
+    <h2><%= typeof searchQuery !== 'undefined' && searchQuery ? 'Search Results' : 'All Blogs' %></h2>
 
     <div class="blog-grid">
       <% if (blogs && blogs.length > 0) { %>
@@ -63,9 +83,14 @@
         <% }) %>
       <% } else { %>
         <div class="no-blogs-box">
-          <p>No blogs yet. Be the first to write one!</p>
-          <% if (user) { %>
-            <a href="/blogs/create" class="btn-primary">✏️ Write First Blog</a>
+          <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+            <p>No blogs found for "<strong><%= searchQuery %></strong>"</p>
+            <a href="/blogs" class="btn-primary">View All Blogs</a>
+          <% } else { %>
+            <p>No blogs yet. Be the first to write one!</p>
+            <% if (user) { %>
+              <a href="/blogs/create" class="btn-primary">✏️ Write First Blog</a>
+            <% } %>
           <% } %>
         </div>
       <% } %>
