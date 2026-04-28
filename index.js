@@ -316,11 +316,32 @@ function isLoggedIn(req, res, next) {
   res.redirect("/signin");
 }
 
-app.get("/dashboard", isLoggedIn, (req, res) => {
-  res.render("dashboard", {
-    title: "Dashboard - Student Blog Platform",
-    currentPage: "dashboard"
-  });
+app.get("/dashboard", isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+
+    const myBlogs = await Blog.find({ author: userId })
+      .sort({ createdAt: -1 });
+
+    let totalLikes = 0;
+    let totalComments = 0;
+
+    myBlogs.forEach(blog => {
+      totalLikes += blog.likes.length;
+      totalComments += blog.comments.length;
+    });
+
+    res.render("dashboard", {
+      title: "Dashboard - Student Blog Platform",
+      currentPage: "dashboard",
+      myBlogs,
+      totalLikes,
+      totalComments
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
 });
 
 app.get("/profile", isLoggedIn, (req, res) => {
