@@ -12,6 +12,7 @@
       <a href="/contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">Contact</a>
 
       <% if (user) { %>
+        <a href="/dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
         <a href="/profile" class="<%= currentPage === 'profile' ? 'active' : '' %>">Profile</a>
         <a href="/logout" class="btn-nav">Logout</a>
       <% } else { %>
