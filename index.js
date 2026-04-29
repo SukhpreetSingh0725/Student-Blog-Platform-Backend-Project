@@ -297,3 +297,373 @@ app.post("/signin", async (req, res) => {
   }
 });
 
+function isLoggedIn(req, res, next) {
+  const token = req.cookies?.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+      return next();
+    } catch (err) {
+      res.clearCookie("token");
+    }
+  }
+  if (req.session.user) {
+    return next();
+  }
+
+  res.redirect("/signin");
+}
+
+app.get("/dashboard", isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+
+    const myBlogs = await Blog.find({ author: userId })
+      .sort({ createdAt: -1 });
+
+    let totalLikes = 0;
+    let totalComments = 0;
+
+    myBlogs.forEach(blog => {
+      totalLikes += blog.likes.length;
+      totalComments += blog.comments.length;
+    });
+
+    res.render("dashboard", {
+      title: "Dashboard - Student Blog Platform",
+      currentPage: "dashboard",
+      myBlogs,
+      totalLikes,
+      totalComments
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.get("/profile", isLoggedIn, (req, res) => {
+  res.render("profile", {
+    title: "Profile - Student Blog Platform",
+    currentPage: "profile"
+  });
+});
+
+app.post("/update-profile", isLoggedIn, upload.single("profilePic"), async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const user = await User.findOne({ email: req.session.user.email });
+
+    if (user) {
+      user.fullName = name;
+      if (password) {
+        user.password = password;
+      }
+      if (req.file) {
+        user.profilePic = req.file.filename;
+      }
+      await user.save();
+      req.session.user = user;
+    }
+
+    res.render("profile", {
+      title: "Profile - Student Blog Platform",
+      currentPage: "profile",
+      success: true
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
+});
+
+app.post("/delete-account", isLoggedIn, async (req, res) => {
+  try {
+    await User.deleteOne({ email: req.session.user.email });
+    req.session.destroy(); 
+    res.redirect("/signup");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong. Please try again.");
+  }
+});
+
+
+app.get("/logout", (req, res) => {
+  res.clearCookie("token"); 
+  res.clearCookie("connect.sid"); 
+  req.session.destroy((err) => { 
+    if (err) console.error(err);
+    res.redirect("/");
+  });
+});
+
+app.get("/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/signin" }),
+  async (req, res) => {
+    req.session.user = req.user;
+
+    const token = jwt.sign(
+      { id: req.user._id, email: req.user.email, fullName: req.user.fullName },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.redirect("/dashboard");
+  }
+);
+
+
+app.get("/blogs", async (req, res) => {
+  try {
+    const blogs = await Blog.find()
+      .populate("author", "fullName profilePic")
+      .sort({ createdAt: -1 });
+
+    res.render("blogs", {
+      title: "Blogs - Student Blog Platform",
+      currentPage: "blogs",
+      blogs,
+      searchQuery: ""
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.get("/blogs/create", isLoggedIn, (req, res) => {
+  res.render("blog-create", {
+    title: "Create Blog - Student Blog Platform",
+    currentPage: "blogs",
+    error: null
+  });
+});
+
+app.post("/blogs/create", isLoggedIn, upload.single("coverImage"), async (req, res) => {
+  try {
+    const { title, content, tags } = req.body;
+
+    if (!title || !content) {
+      return res.render("blog-create", {
+        title: "Create Blog - Student Blog Platform",
+        currentPage: "blogs",
+        error: "Title and content are required."
+      });
+    }
+
+    const coverImage = req.file ? req.file.filename : null;
+    const authorId = req.session.user._id || req.user.id;
+
+    const newBlog = new Blog({
+      title,
+      content,
+      author: authorId,
+      coverImage,
+      tags: tags ? tags.split(",").map(t => t.trim()) : []
+    });
+
+    await newBlog.save();
+    res.redirect("/blogs");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+// ✅ Search blogs
+app.get("/blogs/search", async (req, res) => {
+  try {
+    const query = req.query.q;
+
+    if (!query) return res.redirect("/blogs");
+
+    const blogs = await Blog.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { content: { $regex: query, $options: "i" } }
+      ]
+    })
+    .populate("author", "fullName profilePic")
+    .sort({ createdAt: -1 });
+
+    res.render("blogs", {
+      title: `Search: ${query} - Student Blog Platform`,
+      currentPage: "blogs",
+      blogs,
+      searchQuery: query
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.get("/blogs/:id", async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id)
+      .populate("author", "fullName profilePic")
+      .populate("comments.user", "fullName profilePic");
+
+    if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
+
+    res.render("blog-detail", {
+      title: blog.title + " - Student Blog Platform",
+      currentPage: "blogs",
+      blog
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.get("/blogs/:id/edit", isLoggedIn, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
+
+    const userId = req.session.user._id || req.user.id;
+    if (blog.author.toString() !== userId.toString()) {
+      return res.status(403).send("<h1>Not authorized</h1>");
+    }
+
+    res.render("blog-edit", {
+      title: "Edit Blog - Student Blog Platform",
+      currentPage: "blogs",
+      blog,
+      error: null
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.post("/blogs/:id/edit", isLoggedIn, upload.single("coverImage"), async (req, res) => {
+  try {
+    const { title, content, tags } = req.body;
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
+
+    const userId = req.session.user._id || req.user.id;
+    if (blog.author.toString() !== userId.toString()) {
+      return res.status(403).send("<h1>Not authorized</h1>");
+    }
+
+    blog.title = title;
+    blog.content = content;
+    blog.tags = tags ? tags.split(",").map(t => t.trim()) : [];
+    if (req.file) blog.coverImage = req.file.filename;
+
+    await blog.save();
+    res.redirect("/blogs/" + blog._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.post("/blogs/:id/delete", isLoggedIn, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
+
+    const userId = req.session.user._id || req.user.id;
+    if (blog.author.toString() !== userId.toString()) {
+      return res.status(403).send("<h1>Not authorized</h1>");
+    }
+
+    await Blog.deleteOne({ _id: req.params.id });
+    res.redirect("/blogs");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.post("/blogs/:id/like", isLoggedIn, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("Blog not found");
+
+    const userId = req.session.user._id || req.user.id;
+    const alreadyLiked = blog.likes.includes(userId);
+
+    if (alreadyLiked) {
+      blog.likes.pull(userId);
+    } else {
+      blog.likes.push(userId);
+    }
+
+    await blog.save();
+    res.redirect("/blogs/" + blog._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.post("/blogs/:id/comment", isLoggedIn, async (req, res) => {
+  try {
+    const { text } = req.body;
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("Blog not found");
+
+    const userId = req.session.user._id || req.user.id;
+
+    blog.comments.push({
+      user: userId,
+      text: text
+    });
+
+    await blog.save();
+    res.redirect("/blogs/" + blog._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.post("/blogs/:id/comment/:commentId/delete", isLoggedIn, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("Blog not found");
+
+    const userId = req.session.user._id || req.user.id;
+    const comment = blog.comments.id(req.params.commentId);
+
+    if (comment.user.toString() !== userId.toString()) {
+      return res.status(403).send("<h1>Not authorized</h1>");
+    }
+
+    comment.deleteOne();
+    await blog.save();
+    res.redirect("/blogs/" + blog._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+
+
+app.use((req, res) => {
+  res.status(404).send("<h1>404 - Page Not Found</h1>");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
