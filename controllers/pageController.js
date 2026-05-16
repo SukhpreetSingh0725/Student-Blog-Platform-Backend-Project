@@ -1,7 +1,6 @@
 const Blog = require("../models/Blog");
 const Message = require("../models/Message");
 
-// GET / - Home page
 const getHome = async (req, res) => {
   try {
     const blogs = await Blog.find()
@@ -20,7 +19,6 @@ const getHome = async (req, res) => {
   }
 };
 
-// GET /about - About page
 const getAbout = (req, res) => {
   res.render("about", {
     title: "AboutPage - Student Blog Platform",
@@ -28,7 +26,6 @@ const getAbout = (req, res) => {
   });
 };
 
-// GET /contact - Contact page
 const getContact = (req, res) => {
   res.render("contact", {
     title: "ContactPage - Student Blog Platform",
@@ -37,7 +34,6 @@ const getContact = (req, res) => {
   });
 };
 
-// POST /contact - Submit contact form
 const postContact = async (req, res) => {
   try {
     const { UserName, UserEmail, message } = req.body;
@@ -72,7 +68,6 @@ const postContact = async (req, res) => {
   }
 };
 
-// GET /dashboard - Dashboard page
 const getDashboard = async (req, res) => {
   try {
     const userId = req.session.user._id;

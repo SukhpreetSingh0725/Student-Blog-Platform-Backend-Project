@@ -2,7 +2,6 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// GET /signup
 const getSignup = (req, res) => {
   res.render("signup", {
     title: "SignUp - Student Blog Platform",
@@ -11,7 +10,6 @@ const getSignup = (req, res) => {
   });
 };
 
-// POST /signup
 const postSignup = async (req, res) => {
   try {
     const { UserName: name, UserEmail: email, password, confirmPassword } = req.body;
@@ -87,7 +85,6 @@ const postSignup = async (req, res) => {
   }
 };
 
-// GET /signin
 const getSignin = (req, res) => {
   res.render("signin", {
     title: "SignIn - Student Blog Platform",
@@ -96,7 +93,6 @@ const getSignin = (req, res) => {
   });
 };
 
-// POST /signin
 const postSignin = async (req, res) => {
   try {
     const { UserEmail: email, password } = req.body;
@@ -122,14 +118,12 @@ const postSignin = async (req, res) => {
       });
     }
 
-    // ✅ Create JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, fullName: user.fullName },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // ✅ Store in cookie
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000
@@ -143,7 +137,6 @@ const postSignin = async (req, res) => {
   }
 };
 
-// GET /logout
 const logout = (req, res) => {
   res.clearCookie("token");
   res.clearCookie("connect.sid");
@@ -153,7 +146,6 @@ const logout = (req, res) => {
   });
 };
 
-// GET /auth/google/callback
 const googleCallback = async (req, res) => {
   req.session.user = req.user;
 
