@@ -1210,3 +1210,55 @@ body {
   padding-bottom: 10px;
   border-bottom: 2px solid #e5e7eb;
 }
+
+.error-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.error-box {
+  text-align: center;
+  background: white;
+  padding: 60px 80px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.error-code {
+  font-size: 8rem;
+  font-weight: 700;
+  color: #4f46e5;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.error-box h2 {
+  font-size: 2rem;
+  color: #1e1b4b;
+  margin-bottom: 10px;
+}
+
+.error-box p {
+  color: #6b7280;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .error-box {
+    padding: 40px 20px;
+  }
+  .error-code {
+    font-size: 5rem;
+  }
+}
