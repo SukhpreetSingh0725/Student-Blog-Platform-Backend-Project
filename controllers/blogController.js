@@ -1,16 +1,33 @@
 const Blog = require("../models/Blog");
 
+const getReadTime = (content) => {
+  const wordCount = content.split(" ").length;
+  const minutes = Math.ceil(wordCount / 200);
+  return minutes < 1 ? "1 min read" : `${minutes} min read`;
+};
+
 const getAllBlogs = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+
+    const totalBlogs = await Blog.countDocuments();
+    const totalPages = Math.ceil(totalBlogs / limit);
+
     const blogs = await Blog.find()
       .populate("author", "fullName profilePic")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.render("blogs", {
       title: "Blogs - Student Blog Platform",
       currentPage: "blogs",
       blogs,
-      searchQuery: ""
+      searchQuery: "",
+      page,
+      totalPages
     });
   } catch (err) {
     console.error(err);
@@ -38,14 +55,15 @@ const searchBlogs = async (req, res) => {
       title: `Search: ${query} - Student Blog Platform`,
       currentPage: "blogs",
       blogs,
-      searchQuery: query
+      searchQuery: query,
+      page: 1,
+      totalPages: 1
     });
   } catch (err) {
     console.error(err);
     res.status(500).send("Something went wrong.");
   }
 };
-
 
 const getCreateBlog = (req, res) => {
   res.render("blog-create", {
@@ -54,7 +72,6 @@ const getCreateBlog = (req, res) => {
     error: null
   });
 };
-
 
 const postCreateBlog = async (req, res) => {
   try {
@@ -87,7 +104,6 @@ const postCreateBlog = async (req, res) => {
   }
 };
 
-
 const getBlogDetail = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id)
@@ -99,14 +115,14 @@ const getBlogDetail = async (req, res) => {
     res.render("blog-detail", {
       title: blog.title + " - Student Blog Platform",
       currentPage: "blogs",
-      blog
+      blog,
+      readTime: getReadTime(blog.content) // ✅ added
     });
   } catch (err) {
     console.error(err);
     res.status(500).send("Something went wrong.");
   }
 };
-
 
 const getEditBlog = async (req, res) => {
   try {
@@ -129,7 +145,6 @@ const getEditBlog = async (req, res) => {
     res.status(500).send("Something went wrong.");
   }
 };
-
 
 const postEditBlog = async (req, res) => {
   try {
@@ -154,7 +169,6 @@ const postEditBlog = async (req, res) => {
     res.status(500).send("Something went wrong.");
   }
 };
-
 
 const deleteBlog = async (req, res) => {
   try {

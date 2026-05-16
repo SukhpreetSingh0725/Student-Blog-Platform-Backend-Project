@@ -27,7 +27,19 @@
 
         <div class="form-group">
           <label>Content</label>
-          <textarea name="content" rows="10" required><%= blog.content %></textarea>
+          <textarea
+            name="content"
+            id="content"
+            rows="10"
+            required
+            oninput="updateCounter()"
+          ><%= blog.content %></textarea>
+         
+          <div class="counter-box">
+            <span id="wordCount">📝 Words: 0</span>
+            <span id="charCount">🔤 Characters: 0</span>
+            <span id="readTimeCount">⏱ Read Time: 0 min</span>
+          </div>
         </div>
 
         <div class="form-group">
@@ -58,6 +70,35 @@
   <%- include("partials/footer") %>
 
   <script>
+   
+    window.onload = function() {
+      updateCounter();
+    };
+
+
+    function updateCounter() {
+      const content = document.getElementById("content").value;
+      const counterBox = document.querySelector(".counter-box");
+
+      const words = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
+      const chars = content.length;
+      const readTime = Math.ceil(words / 200) || 0;
+
+      document.getElementById("wordCount").textContent = `📝 Words: ${words}`;
+      document.getElementById("charCount").textContent = `🔤 Characters: ${chars}`;
+      document.getElementById("readTimeCount").textContent = `⏱ Read Time: ${readTime} min`;
+
+
+      if (words < 50) {
+        counterBox.style.color = "red";
+      } else if (words < 200) {
+        counterBox.style.color = "orange";
+      } else {
+        counterBox.style.color = "green";
+      }
+    }
+
+
     function previewCover(input) {
       const preview = document.getElementById("coverPreview");
       if (input.files && input.files[0]) {
