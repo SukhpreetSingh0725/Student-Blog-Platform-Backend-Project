@@ -482,7 +482,7 @@ app.post("/blogs/create", isLoggedIn, upload.single("coverImage"), async (req, r
   }
 });
 
-// ✅ Search blogs
+
 app.get("/blogs/search", async (req, res) => {
   try {
     const query = req.query.q;
