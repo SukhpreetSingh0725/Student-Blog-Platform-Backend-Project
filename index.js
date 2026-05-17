@@ -6,13 +6,17 @@ const MongoStore = require("connect-mongo").default;
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const connectDB = require("./config/db");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const PORT = 3000;
+
 connectDB();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
 
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
@@ -81,6 +85,24 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("joinBlog", (blogId) => {
+    socket.join(blogId);
+    console.log(`User joined blog room: ${blogId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

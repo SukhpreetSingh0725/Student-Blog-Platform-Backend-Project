@@ -112,11 +112,20 @@ const getBlogDetail = async (req, res) => {
 
     if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
 
+    const relatedBlogs = await Blog.find({
+      _id: { $ne: blog._id },
+      author: { $ne: blog.author._id },
+      tags: { $in: blog.tags }
+    })
+      .populate("author", "fullName profilePic")
+      .limit(3);
+
     res.render("blog-detail", {
       title: blog.title + " - Student Blog Platform",
       currentPage: "blogs",
       blog,
-      readTime: getReadTime(blog.content) 
+      readTime: getReadTime(blog.content),
+      relatedBlogs
     });
   } catch (err) {
     console.error(err);
@@ -188,6 +197,7 @@ const deleteBlog = async (req, res) => {
   }
 };
 
+// ✅ Like with Socket.io
 const likeBlog = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -203,6 +213,14 @@ const likeBlog = async (req, res) => {
     }
 
     await blog.save();
+
+    // ✅ Emit live like count to all users viewing this blog
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("likeUpdated", {
+      blogId: req.params.id,
+      likes: blog.likes.length
+    });
+
     res.redirect("/blogs/" + blog._id);
   } catch (err) {
     console.error(err);
@@ -210,6 +228,7 @@ const likeBlog = async (req, res) => {
   }
 };
 
+// ✅ Comment with Socket.io
 const addComment = async (req, res) => {
   try {
     const { text } = req.body;
@@ -218,12 +237,29 @@ const addComment = async (req, res) => {
 
     const userId = req.session.user._id || req.user.id;
 
-    blog.comments.push({
-      user: userId,
-      text: text
+    blog.comments.push({ user: userId, text });
+    await blog.save();
+
+    // ✅ Get latest comment with user info
+    await blog.populate("comments.user", "fullName profilePic");
+    const latestComment = blog.comments[blog.comments.length - 1];
+
+    // ✅ Emit live comment to all users viewing this blog
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("newComment", {
+      blogId: req.params.id,
+      comment: {
+        _id: latestComment._id,
+        text: latestComment.text,
+        user: {
+          fullName: latestComment.user.fullName,
+          profilePic: latestComment.user.profilePic
+        },
+        createdAt: latestComment.createdAt
+      },
+      totalComments: blog.comments.length
     });
 
-    await blog.save();
     res.redirect("/blogs/" + blog._id);
   } catch (err) {
     console.error(err);
