@@ -116,7 +116,7 @@ const getBlogDetail = async (req, res) => {
       title: blog.title + " - Student Blog Platform",
       currentPage: "blogs",
       blog,
-      readTime: getReadTime(blog.content) // ✅ added
+      readTime: getReadTime(blog.content) 
     });
   } catch (err) {
     console.error(err);

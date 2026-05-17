@@ -226,6 +226,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
+  align-items: start; 
 }
 
 .blog-card {
@@ -237,6 +238,9 @@ body {
   transition: transform 0.3s ease;
   overflow: hidden;
   z-index: 0;
+  display: flex;    
+  flex-direction: column; 
+  height: 100%;  
 }
 
 .blog-card::before {
@@ -307,9 +311,6 @@ body {
   grid-column: 1 / -1;
 }
 
-/* ─────────────────────────────────────────
-   SUCCESS PAGE
-───────────────────────────────────────── */
 .success-page {
   padding: 100px 20px;
   display: flex;
@@ -879,7 +880,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-top: 12px;
+  margin-top: auto;
   font-size: 0.9rem;
   color: #555;
 }
@@ -1261,4 +1262,49 @@ body {
   .error-code {
     font-size: 5rem;
   }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: white;
+  color: #4f46e5;
+  border: 2px solid #4f46e5;
+  transition: 0.3s ease;
+}
+
+.page-btn:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+.page-btn.active {
+  background: #4f46e5;
+  color: white;
+}
+
+.page-btn.disabled {
+  color: #9ca3af;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.page-info {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 10px;
+  font-size: 0.9rem;
 }
