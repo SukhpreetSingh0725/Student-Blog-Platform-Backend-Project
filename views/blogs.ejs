@@ -22,6 +22,7 @@
     </div>
   </section>
 
+  <!-- Search Bar -->
   <div class="search-bar">
     <form action="/blogs/search" method="GET">
       <input
@@ -34,6 +35,20 @@
     </form>
   </div>
 
+  <!-- ✅ Filter Buttons — only show when logged in -->
+  <% if (user && !searchQuery) { %>
+    <div class="filter-bar">
+      <a href="/blogs?filter=all"
+        class="filter-btn <%= filter === 'all' ? 'active' : '' %>">
+        🌐 All Blogs
+      </a>
+      <a href="/blogs?filter=mine"
+        class="filter-btn <%= filter === 'mine' ? 'active' : '' %>">
+        👤 My Blogs
+      </a>
+    </div>
+  <% } %>
+
   <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
     <p class="search-info">
       Showing results for: <strong>"<%= searchQuery %>"</strong>
@@ -43,7 +58,17 @@
   <% } %>
 
   <section class="blogs">
-    <h2><%= typeof searchQuery !== 'undefined' && searchQuery ? 'Search Results' : 'All Blogs' %></h2>
+
+    <!-- ✅ Dynamic heading based on filter -->
+    <h2>
+      <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+        Search Results
+      <% } else if (filter === 'mine') { %>
+        My Blogs
+      <% } else { %>
+        All Blogs
+      <% } %>
+    </h2>
 
     <div class="blog-grid">
       <% if (blogs && blogs.length > 0) { %>
@@ -87,6 +112,9 @@
           <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
             <p>No blogs found for "<strong><%= searchQuery %></strong>"</p>
             <a href="/blogs" class="btn-primary">View All Blogs</a>
+          <% } else if (filter === 'mine') { %>
+            <p>You haven't written any blogs yet!</p>
+            <a href="/blogs/create" class="btn-primary">✏️ Write First Blog</a>
           <% } else { %>
             <p>No blogs yet. Be the first to write one!</p>
             <% if (user) { %>
@@ -97,37 +125,33 @@
       <% } %>
     </div>
 
-    <!-- ✅ Pagination -->
-<% if (!searchQuery && totalPages > 1) { %>
-  <div class="pagination">
+    <!-- Pagination -->
+    <% if (!searchQuery && totalPages > 1) { %>
+      <div class="pagination">
 
-    <!-- Previous Button -->
-    <% if (page > 1) { %>
-      <a href="/blogs?page=<%= page - 1 %>" class="page-btn">← Previous</a>
-    <% } else { %>
-      <span class="page-btn disabled">← Previous</span>
+        <% if (page > 1) { %>
+          <a href="/blogs?page=<%= page - 1 %>&filter=<%= filter %>" class="page-btn">← Previous</a>
+        <% } else { %>
+          <span class="page-btn disabled">← Previous</span>
+        <% } %>
+
+        <% for(let i = 1; i <= totalPages; i++) { %>
+          <% if (page === i) { %>
+            <a href="/blogs?page=<%= i %>&filter=<%= filter %>" class="page-btn active"><%= i %></a>
+          <% } else { %>
+            <a href="/blogs?page=<%= i %>&filter=<%= filter %>" class="page-btn"><%= i %></a>
+          <% } %>
+        <% } %>
+
+        <% if (page < totalPages) { %>
+          <a href="/blogs?page=<%= page + 1 %>&filter=<%= filter %>" class="page-btn">Next →</a>
+        <% } else { %>
+          <span class="page-btn disabled">Next →</span>
+        <% } %>
+
+      </div>
+      <p class="page-info">Page <%= page %> of <%= totalPages %></p>
     <% } %>
-
-
-    <% for(let i = 1; i <= totalPages; i++) { %>
-      <% if (page === i) { %>
-        <a href="/blogs?page=<%= i %>" class="page-btn active"><%= i %></a>
-      <% } else { %>
-        <a href="/blogs?page=<%= i %>" class="page-btn"><%= i %></a>
-      <% } %>
-    <% } %>
-
-  
-    <% if (page < totalPages) { %>
-      <a href="/blogs?page=<%= page + 1 %>" class="page-btn">Next →</a>
-    <% } else { %>
-      <span class="page-btn disabled">Next →</span>
-    <% } %>
-
-  </div>
-
-  <p class="page-info">Page <%= page %> of <%= totalPages %></p>
-<% } %>
 
   </section>
 

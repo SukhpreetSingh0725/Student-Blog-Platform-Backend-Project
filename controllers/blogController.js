@@ -11,11 +11,18 @@ const getAllBlogs = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
+    const filter = req.query.filter; // ✅ get filter from URL
 
-    const totalBlogs = await Blog.countDocuments();
+    // ✅ Build query based on filter
+    let query = {};
+    if (filter === "mine" && req.session.user) {
+      query = { author: req.session.user._id };
+    }
+
+    const totalBlogs = await Blog.countDocuments(query);
     const totalPages = Math.ceil(totalBlogs / limit);
 
-    const blogs = await Blog.find()
+    const blogs = await Blog.find(query)
       .populate("author", "fullName profilePic")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -27,7 +34,8 @@ const getAllBlogs = async (req, res) => {
       blogs,
       searchQuery: "",
       page,
-      totalPages
+      totalPages,
+      filter: filter || "all"
     });
   } catch (err) {
     console.error(err);
