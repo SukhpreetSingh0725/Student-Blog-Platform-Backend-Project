@@ -34,8 +34,6 @@
       <button type="submit">🔍 Search</button>
     </form>
   </div>
-
-  <!-- ✅ Filter Buttons — only show when logged in -->
   <% if (user && !searchQuery) { %>
     <div class="filter-bar">
       <a href="/blogs?filter=all"
@@ -58,8 +56,6 @@
   <% } %>
 
   <section class="blogs">
-
-    <!-- ✅ Dynamic heading based on filter -->
     <h2>
       <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
         Search Results
@@ -124,8 +120,6 @@
         </div>
       <% } %>
     </div>
-
-    <!-- Pagination -->
     <% if (!searchQuery && totalPages > 1) { %>
       <div class="pagination">
 

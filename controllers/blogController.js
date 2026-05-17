@@ -11,9 +11,9 @@ const getAllBlogs = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
-    const filter = req.query.filter; // ✅ get filter from URL
+    const filter = req.query.filter; 
 
-    // ✅ Build query based on filter
+  
     let query = {};
     if (filter === "mine" && req.session.user) {
       query = { author: req.session.user._id };
@@ -128,12 +128,21 @@ const getBlogDetail = async (req, res) => {
       .populate("author", "fullName profilePic")
       .limit(3);
 
+      const authorBlogs = await Blog.find({
+        _id: { $ne: blog._id },      
+        author: blog.author._id       
+      })
+        .populate("author", "fullName profilePic")
+        .sort({ createdAt: -1 })
+        .limit(3)
+
     res.render("blog-detail", {
       title: blog.title + " - Student Blog Platform",
       currentPage: "blogs",
       blog,
       readTime: getReadTime(blog.content),
-      relatedBlogs
+      relatedBlogs,
+      authorBlogs
     });
   } catch (err) {
     console.error(err);
@@ -205,7 +214,6 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-// ✅ Like with Socket.io
 const likeBlog = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -221,8 +229,6 @@ const likeBlog = async (req, res) => {
     }
 
     await blog.save();
-
-    // ✅ Emit live like count to all users viewing this blog
     const io = req.app.get("io");
     io.to(req.params.id).emit("likeUpdated", {
       blogId: req.params.id,
@@ -236,7 +242,6 @@ const likeBlog = async (req, res) => {
   }
 };
 
-// ✅ Comment with Socket.io
 const addComment = async (req, res) => {
   try {
     const { text } = req.body;
@@ -247,12 +252,8 @@ const addComment = async (req, res) => {
 
     blog.comments.push({ user: userId, text });
     await blog.save();
-
-    // ✅ Get latest comment with user info
     await blog.populate("comments.user", "fullName profilePic");
     const latestComment = blog.comments[blog.comments.length - 1];
-
-    // ✅ Emit live comment to all users viewing this blog
     const io = req.app.get("io");
     io.to(req.params.id).emit("newComment", {
       blogId: req.params.id,
