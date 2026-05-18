@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+
+  <%- include("../partials/header") %>
+
+  <section class="admin-section">
+    <div class="admin-box">
+
+      <div class="admin-header">
+        <h2>✉️ Contact Messages (<%= messages.length %>)</h2>
+        <a href="/admin" class="btn-secondary">← Back to Admin</a>
+      </div>
+
+      <% if (messages.length > 0) { %>
+        <div class="messages-list">
+          <% messages.forEach(msg => { %>
+            <div class="message-card">
+              <div class="message-header">
+                <div>
+                  <strong><%= msg.fullName %></strong>
+                  <small style="display:block; color:#6b7280;"><%= msg.email %></small>
+                  <small style="color:#6b7280;"><%= new Date(msg.createdAt).toDateString() %></small>
+                </div>
+                <form action="/admin/messages/<%= msg._id %>/delete" method="POST"
+                  onsubmit="return confirm('Delete this message?')">
+                  <button class="btn-danger" style="margin:0; padding:6px 12px; font-size:0.8rem;">
+                    🗑 Delete
+                  </button>
+                </form>
+              </div>
+              <p class="message-text"><%= msg.message %></p>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p style="text-align:center; color:#6b7280; padding:40px;">No messages yet.</p>
+      <% } %>
+
+    </div>
+  </section>
+
+  <%- include("../partials/footer") %>
+
+</body>
+</html>

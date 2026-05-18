@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 const http = require("http");
 const { Server } = require("socket.io");
 
+
 const app = express();
 const PORT = 3000;
 
@@ -22,6 +23,7 @@ app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -68,15 +70,18 @@ app.use(async (req, res, next) => {
   }
 });
 
+
 const pageRoutes = require("./routes/pageRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 app.use("/", pageRoutes);
 app.use("/", authRoutes);
 app.use("/", userRoutes);
 app.use("/blogs", blogRoutes);
+app.use("/admin", adminRoutes); 
 
 app.use((req, res) => {
   res.status(404).render("404", {
@@ -84,6 +89,7 @@ app.use((req, res) => {
     currentPage: ""
   });
 });
+
 
 const server = http.createServer(app);
 const io = new Server(server);

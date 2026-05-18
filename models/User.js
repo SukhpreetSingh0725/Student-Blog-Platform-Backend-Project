@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "default-avatar.png"
     },
+    isAdmin: {
+      type: Boolean,
+      default: false
+    },
     googleId: {
       type: String,
       default: null

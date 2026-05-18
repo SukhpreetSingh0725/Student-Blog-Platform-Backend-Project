@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+
+  <%- include("../partials/header") %>
+
+  <section class="admin-section">
+    <div class="admin-box">
+
+      <div class="admin-header">
+        <h2>👥 All Users (<%= users.length %>)</h2>
+        <a href="/admin" class="btn-secondary">← Back to Admin</a>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Joined</th>
+              <th>Admin</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+              <tr>
+                <td>
+                  <img src="/uploads/<%= u.profilePic %>" alt="pic"
+                    style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                </td>
+                <td><strong><%= u.fullName %></strong></td>
+                <td><%= u.email %></td>
+                <td><%= new Date(u.date).toDateString() %></td>
+                <td>
+                  <% if (u.isAdmin) { %>
+                    <span style="color:green; font-weight:600;">✅ Yes</span>
+                  <% } else { %>
+                    <span style="color:#6b7280;">No</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (!u.isAdmin) { %>
+                    <form action="/admin/users/<%= u._id %>/delete" method="POST"
+                      onsubmit="return confirm('Delete this user and all their blogs?')">
+                      <button class="btn-danger" style="margin:0; padding:6px 12px; font-size:0.8rem;">
+                        🗑 Delete
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <span style="color:#6b7280; font-size:0.85rem;">Protected</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include("../partials/footer") %>
+
+</body>
+</html>

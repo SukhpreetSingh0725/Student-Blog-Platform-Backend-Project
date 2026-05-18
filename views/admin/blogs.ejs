@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+
+  <%- include("../partials/header") %>
+
+  <section class="admin-section">
+    <div class="admin-box">
+
+      <div class="admin-header">
+        <h2>📝 All Blogs (<%= blogs.length %>)</h2>
+        <a href="/admin" class="btn-secondary">← Back to Admin</a>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Likes</th>
+              <th>Comments</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% blogs.forEach(blog => { %>
+              <tr>
+                <td>
+                  <a href="/blogs/<%= blog._id %>" style="color:#4f46e5; font-weight:600;">
+                    <%= blog.title.substring(0, 30) %>...
+                  </a>
+                </td>
+                <td><%= blog.author.fullName %></td>
+                <td>❤️ <%= blog.likes.length %></td>
+                <td>💬 <%= blog.comments.length %></td>
+                <td><%= new Date(blog.createdAt).toDateString() %></td>
+                <td>
+                  <form action="/admin/blogs/<%= blog._id %>/delete" method="POST"
+                    onsubmit="return confirm('Delete this blog permanently?')">
+                    <button class="btn-danger" style="margin:0; padding:6px 12px; font-size:0.8rem;">
+                      🗑 Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include("../partials/footer") %>
+
+</body>
+</html>
