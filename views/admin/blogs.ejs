@@ -40,13 +40,24 @@
                 </td>
                 <td><%= blog.author.fullName %></td>
                 <td>❤️ <%= blog.likes.length %></td>
-                <td>💬 <%= blog.comments.length %></td>
+                <td>
+
+                  <% if (blog.comments.length > 0) { %>
+                    <a href="/blogs/<%= blog._id %>"
+                      style="color:#4f46e5; font-weight:600; text-decoration:none;">
+                      💬 <%= blog.comments.length %> Manage →
+                    </a>
+                  <% } else { %>
+                    <span style="color:#6b7280;">💬 0</span>
+                  <% } %>
+                </td>
                 <td><%= new Date(blog.createdAt).toDateString() %></td>
                 <td>
                   <form action="/admin/blogs/<%= blog._id %>/delete" method="POST"
                     onsubmit="return confirm('Delete this blog permanently?')">
-                    <button class="btn-danger" style="margin:0; padding:6px 12px; font-size:0.8rem;">
-                      🗑 Delete
+                    <button class="btn-danger"
+                      style="margin:0; padding:6px 12px; font-size:0.8rem;">
+                      🗑 Delete Blog
                     </button>
                   </form>
                 </td>

@@ -61,6 +61,7 @@ const getAdminBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find()
       .populate("author", "fullName email")
+      .populate("comments.user", "fullName")
       .sort({ createdAt: -1 });
 
     res.render("admin/blogs", {
@@ -109,12 +110,30 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+const deleteAdminComment = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.blogId);
+    if (!blog) return res.status(404).send("Blog not found");
+
+    const comment = blog.comments.id(req.params.commentId);
+    if (!comment) return res.status(404).send("Comment not found");
+
+    comment.deleteOne();
+    await blog.save();
+    res.redirect("/blogs/" + req.params.blogId);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong.");
+  }
+};
+
 module.exports = {
   getAdminDashboard,
   getAdminUsers,
   deleteUser,
   getAdminBlogs,
   deleteAdminBlog,
+  deleteAdminComment, 
   getAdminMessages,
   deleteMessage
 };

@@ -6,6 +6,7 @@ const {
   deleteUser,
   getAdminBlogs,
   deleteAdminBlog,
+  deleteAdminComment,
   getAdminMessages,
   deleteMessage
 } = require("../controllers/adminController");
@@ -19,6 +20,7 @@ router.get("/users", getAdminUsers);
 router.post("/users/:id/delete", deleteUser);
 router.get("/blogs", getAdminBlogs);
 router.post("/blogs/:id/delete", deleteAdminBlog);
+router.post("/blogs/:blogId/comment/:commentId/delete", deleteAdminComment);
 router.get("/messages", getAdminMessages);
 router.post("/messages/:id/delete", deleteMessage);
 
