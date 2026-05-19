@@ -1,4 +1,6 @@
 const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -24,4 +26,13 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 }
 });
 
-module.exports = { upload };
+const deleteFile = (filename) => {
+  if (!filename || filename === "default-avatar.png") return;
+
+  const filePath = path.join(__dirname, "../uploads", filename);
+  fs.unlink(filePath, (err) => {
+    if (err) console.error("Error deleting file:", err);
+    else console.log("Deleted file:", filename);
+  });
+};
+module.exports = { upload,deleteFile };

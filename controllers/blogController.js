@@ -1,4 +1,5 @@
 const Blog = require("../models/Blog");
+const { deleteFile } = require("../middleware/upload");
 
 const getReadTime = (content) => {
   const wordCount = content.split(" ").length;
@@ -205,7 +206,9 @@ const deleteBlog = async (req, res) => {
     if (blog.author.toString() !== userId.toString()) {
       return res.status(403).send("<h1>Not authorized</h1>");
     }
-
+    if (blog.coverImage) {
+      deleteFile(blog.coverImage);
+    }
     await Blog.deleteOne({ _id: req.params.id });
     res.redirect("/blogs");
   } catch (err) {

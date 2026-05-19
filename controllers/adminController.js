@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Blog = require("../models/Blog");
 const Message = require("../models/Message");
+const { deleteFile } = require("../middleware/upload");
 
 const getAdminDashboard = async (req, res) => {
   try {
@@ -47,8 +48,21 @@ const getAdminUsers = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    await User.deleteOne({ _id: req.params.id });
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send("User not found");
+
+    if (user.profilePic) {
+      deleteFile(user.profilePic);
+    }
+    const userBlogs = await Blog.find({ author: req.params.id });
+    userBlogs.forEach(blog => {
+      if (blog.coverImage) {
+        deleteFile(blog.coverImage);
+      }
+    });
     await Blog.deleteMany({ author: req.params.id });
+    await User.deleteOne({ _id: req.params.id });
+
     res.redirect("/admin/users");
   } catch (err) {
     console.error(err);
@@ -76,8 +90,16 @@ const getAdminBlogs = async (req, res) => {
 };
 
 
+
+
 const deleteAdminBlog = async (req, res) => {
   try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).send("<h1>Blog not found</h1>");
+    if (blog.coverImage) {
+      deleteFile(blog.coverImage);
+    }
+
     await Blog.deleteOne({ _id: req.params.id });
     res.redirect("/admin/blogs");
   } catch (err) {
