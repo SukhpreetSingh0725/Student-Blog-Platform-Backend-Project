@@ -26,7 +26,9 @@
                 <div>
                   <strong><%= msg.fullName %></strong>
                   <small style="display:block; color:#6b7280;"><%= msg.email %></small>
-                  <small style="color:#6b7280;"><%= new Date(msg.createdAt).toDateString() %></small>
+                  <small style="color:#6b7280;">
+                    <%= msg.createdAt ? new Date(msg.createdAt).toDateString() : new Date(msg.date).toDateString() %>
+                  </small>
                 </div>
                 <form action="/admin/messages/<%= msg._id %>/delete" method="POST"
                   onsubmit="return confirm('Delete this message?')">
